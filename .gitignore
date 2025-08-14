@@ -37,8 +37,6 @@ yarn-error.*
 *.tsbuildinfo
 
 # Added by team setup
-web-build/
-dist/
 build/
 android/app/build/
 ios/build/

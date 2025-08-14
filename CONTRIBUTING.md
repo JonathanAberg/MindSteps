@@ -21,8 +21,7 @@ Den här guiden beskriver hur vi arbetar i projektet.
 
 - Skapa PR mot `dev` och använd PR-mallen.
 - Minst 1 godkännande. Håll PR små och fokuserade.
-- Föredra "Squash and merge" och sätt squash-titel enligt Conventional Commits. ("Squash and merge" = Sammanfogar alla commits i PR till en enda commit på target-branchen. Fördel: ren historik + gör framtida changelog och demo-presentation enklare.
-  Nackdel: förlorar individuella commitsteg (ofta OK i små team).)
+- Föredra "Squash and merge" och sätt squash-titel enligt Conventional Commits.
 
 ## CI och kvalitetskrav
 
@@ -32,17 +31,32 @@ Den här guiden beskriver hur vi arbetar i projektet.
 ## Kodstil
 
 - TypeScript strikt. ESLint + Prettier.
-- Pre-commit: Husky + lint-staged kör lint/format automatiskt.
-- Failar hooken: åtgärda och committa igen (undvik `--no-verify`. `--no-verify` hoppar över hooks; använd bara om något är trasigt och behöver akut fixas.).
+- Ingen automatisk pre-commit hook – du ansvarar själv för att koden är ren innan commit.
+- Rekommenderad editor-konfiguration (lägg i egna user/workspace settings):
+  - "editor.formatOnSave": true
+  - "editor.codeActionsOnSave": { "source.fixAll.eslint": "explicit" }
 
 ESLint: regelmotor för kodkvalitet och stil.
-Prettier: formateringsverktyg (hanterar whitespace, citationstecken, etc).
-Strict TypeScript: aktiverar strikta kontroller (färre runtime-överraskningar).
+Prettier: formateringsverktyg (whitespace, citationstecken, etc).
+Strict TypeScript: färre runtime-överraskningar.
 
-Husky: hanterar Git hooks (t.ex. pre-commit, commit-msg).
-lint-staged: kör definierade kommandon endast på filer som är staged (snabbare än att köra på hela koden).
+## Lokala kontroller (manuellt flöde)
 
-Effekt: förhindrar att dåligt formaterad eller uppenbart felaktig kod commitas.
+Kör innan du öppnar PR eller pushar:
+
+```
+npm run lint
+npm run typecheck
+npm test
+```
+
+Eller samla allt:
+
+```
+npm run check
+```
+
+Missar du detta fångas det i CI, men du sparar tid genom att köra det lokalt först.
 
 ## Testning
 
@@ -52,31 +66,27 @@ Effekt: förhindrar att dåligt formaterad eller uppenbart felaktig kod commitas
 
 ## Projektstruktur
 
-- Använd `src/` med t.ex. `components/`, `screens/`, `navigation/`, `hooks/`, `services/`, `store/`, `utils/`, `types/`.
+- All applikationskod ligger under `src/` med t.ex. `components/`, `screens/`, `navigation/`, `hooks/`, `services/`, `store/`, `utils/`, `types/`.
 - Importalias: `@/*` (se `tsconfig.json`).
-- Flytta gradvis från root till `src/`.
 
----
-
-src/: konvention att samla all applikationskod istället för root.
-components/: återanvändbara visuella enheter.
-screens/: fullständiga vyer (kopplas ofta till navigation).
-navigation/: stack/tab/router-konfiguration.
-hooks/: delad logik (custom hooks).
-services/: API-anrop, storage, sensordata.
-store/: global state (om ni lägger till t.ex. Zustand/Redux).
-utils/: små hjälpfunktioner.
-types/: delade TypeScript-typer.
-Alias @/\*: gör imports kortare än relativa kedjor (../../).
-
----
+```
+src/
+  components/        # Återanvändbara UI-komponenter (knappar, kort, inputs)
+  screens/           # Hela vyer kopplade till navigation (Home, Settings)
+  navigation/        # Stack/tab/other navigator-konfiguration och helpers
+  hooks/             # Custom React hooks (useSomething)
+  services/          # API-klienter, storage, sensorer, nätverkslogik
+  store/             # Global state (Zustand/Redux/contexts) + ev. persist
+  utils/             # Små rena hjälpfunktioner (format, calc, parse)
+  types/             # Delade TypeScript-typer, interfaces, DTOs
+```
 
 ## Vanliga kommandon
 
 - Installera: `npm ci`
 - Starta: `npm run start`
-- iOS: `npx expo start --ios` eller `npm run ios`
-- Android: `npx expo start --android` eller `npm run android`
+- iOS: `npm run ios`
+- Android: `npm run android`
 - Rensa cache: `npx expo start -c`
 - Lint: `npm run lint`
 - Typecheck: `npm run typecheck`
@@ -89,9 +99,6 @@ Alias @/\*: gör imports kortare än relativa kedjor (../../).
 - [ ] PR-beskrivning ifylld (vad/varför/hur testas)
 - [ ] Ingen död kod, inga TODOs utan issue
 
-- Säkerställer att ändringen är tekniskt och processmässigt redo.
-- “Ingen död kod”: ta bort oanvända variabler, kommenterade block, console.log.
-
 ## Beroenden och miljö
 
 - Lägg inte `.env*` i repo (ignoreras). Dela säkert.
@@ -101,13 +108,6 @@ Alias @/\*: gör imports kortare än relativa kedjor (../../).
 
 - Använd Issues + labels/milstolpar (Projects valfritt).
 - Skapa små tasks (0.5–1 dag). Koppla PR till issue.
-
-Issues: enskilda uppgifter/buggar.
-Labels: klassificering (bug, feature, priority).
-Milestones: grupperar issues mot ett mål.
-Projects (GitHub Projects): kanban eller planeringstavla (valfritt).
-
----
 
 ## TL;DR / Cheat sheet
 
@@ -125,36 +125,18 @@ Daglig rutin:
 1. `git pull origin dev`
 2. `git checkout -b feat/namn`
 3. Koda
-4. `npm run lint && npm run typecheck && npm test`
+4. `npm run check`
 5. Commit + push
 6. PR → dev
 
 Scripts:
 
 - Start: `npm run start`
-- iOS snabb: `npx expo start --ios`
-- Android snabb: `npx expo start --android`
 - Lint: `npm run lint`
 - Typer: `npm run typecheck`
 - Test: `npm test`
 - Format: `npm run format`
-
-Hooks:
-
-- Pre-commit fixar lint/format.
-- Misslyckas → fixa och försök igen.
-
-Struktur (mål):
-
-```
-src/
-  components/
-  screens/
-  hooks/
-  services/
-  utils/
-  types/
-```
+- Allt: `npm run check`
 
 Problem?
 
