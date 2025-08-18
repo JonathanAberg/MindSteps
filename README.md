@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-# MindSteps
-=======
 # MindSteps
 
 Framtida beskrivning av appens syfte.
@@ -19,4 +16,3 @@ npm run android
 ## Teamrutiner
 
 Se CONTRIBUTING.md för vår arbetsprocess (branch-strategi, commits, PR, CI, kodstil, tester).
->>>>>>> 8e3c26a (initial commit)
