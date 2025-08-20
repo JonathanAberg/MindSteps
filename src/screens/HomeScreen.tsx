@@ -8,4 +8,17 @@ const HomeScreen: React.FC = () => {
     </View>
   );
 };
+
 export default HomeScreen;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  text: {
+    fontSize: 20,
+    fontWeight: '600',
+  },
+});
