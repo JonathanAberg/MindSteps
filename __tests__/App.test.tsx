@@ -5,6 +5,7 @@ import { render } from '@testing-library/react-native';
 import App from '../src/App';
 
 test('renders app root', () => {
-  const { getByText } = render(<App />);
-  expect(getByText(/open up App\.tsx/i)).toBeTruthy();
+  const { getByText, getAllByText } = render(<App />);
+  expect(getByText('MindSteps 👣')).toBeTruthy();
+  expect(getAllByText('Home')).toHaveLength(2); // Tab + screen title
 });
