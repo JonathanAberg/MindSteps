@@ -1,1 +1,1 @@
-declare module 'react-native-vector-icons/FonteAwesome5';
+declare module 'react-native-vector-icons/FontAwesome5';
