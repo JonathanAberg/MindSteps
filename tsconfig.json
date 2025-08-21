@@ -15,7 +15,7 @@
     },
     "types": ["react", "react-native"]
   },
-  "include": ["src", "App.tsx", "app.config.ts", "app.json"],
+  "include": ["src", "types", "App.tsx", "app.config.ts", "app.json"],
   "exclude": ["node_modules"],
   "extends": "expo/tsconfig.base"
 }
