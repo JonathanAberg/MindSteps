@@ -8,6 +8,7 @@ test('renders app root', async () => {
   const { getByText, getAllByText } = render(<App />);
   await waitFor(() => {
     expect(getByText('MindSteps 👣')).toBeTruthy();
-    expect(getAllByText('Home')).toHaveLength(2); // Tab + screen title
+    expect(getAllByText('Hem')).toHaveLength(2); // Tab + screen title
   });
+
 });
