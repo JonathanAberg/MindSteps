@@ -23,21 +23,21 @@ export default function MoodSelector({
 
       <View style={styles.row}>
         <Option
-          label="Bättre?"
+          label="Bättre"
           icon="smile"
           color="#6DBE7D"
           selected={value === 'better'}
           onPress={() => onChange('better')}
         />
         <Option
-          label="Likadant?"
+          label="Likadant"
           icon="meh"
           color="#689FE0"
           selected={value === 'same'}
           onPress={() => onChange('same')}
         />
         <Option
-          label="Sämre?"
+          label="Sämre"
           icon="frown"
           color="#E57373"
           selected={value === 'worse'}
