@@ -1,24 +1,106 @@
+import StartWalkButton from '@/components/StartWalkButton';
+import TripleFeatureRow from '@/components/TripleFeatureRow';
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image, SafeAreaView } from 'react-native';
+import {
+  useFonts,
+  AnnieUseYourTelescope_400Regular,
+} from '@expo-google-fonts/annie-use-your-telescope'; // Installera med: expo install @expo-google-fonts/annie-use-your-telescope expo-font
 
 const HomeScreen: React.FC = () => {
+  const [fontsLoaded] = useFonts({ AnnieUseYourTelescope_400Regular });
+  if (!fontsLoaded) return null;
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>MindSteps 👣</Text>
-    </View>
+    <SafeAreaView style={styles.safe}>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Image
+            source={require('../../assets/images/mindstepslogo.png')}
+            style={styles.logo}
+            resizeMode="contain"
+            accessible
+            accessibilityLabel="MindSteps logotyp"
+          />
+          <Text style={styles.tagline}>one step closer to a better mind</Text>
+          <Text>MindSteps 👣</Text>
+        </View>
+
+        <View style={styles.buttonWrap}>
+          <StartWalkButton />
+        </View>
+
+        <View style={styles.helperWrap}>
+          <Text style={styles.helperTop}>Redo att rensa tankarna?</Text>
+          <Text style={styles.helperBottom}>Din senaste promenad var igår, 2,1 km</Text>
+        </View>
+
+        <View style={styles.featuresWrap}>
+          <TripleFeatureRow />
+        </View>
+      </View>
+    </SafeAreaView>
   );
 };
 
 export default HomeScreen;
 
 const styles = StyleSheet.create({
+  safe: { flex: 1, backgroundColor: '#fff' },
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
   },
-  text: {
-    fontSize: 20,
-    fontWeight: '600',
+  header: {
+    alignItems: 'center',
+    width: '100%', // ⟵ viktigt
+  },
+  logo: {
+    width: 250,
+    height: 250,
+    marginBottom: -40, // ⟵ dra upp logotypen lite
+  },
+
+  tagline: {
+    fontFamily: 'AnnieUseYourTelescope_400Regular', // <— från Google Fonts
+    fontSize: 14,
+    color: '#000000',
+    textAlign: 'center',
+    alignSelf: 'stretch', // ⟵ ge full bredd
+    flexShrink: 1, // ⟵ låt den radbrytas istället för att klippas
+  },
+
+  /* STARTWALK-BUTTON */
+  buttonWrap: {
+    width: '100%',
+    maxWidth: 520,
+    marginTop: 8,
+  },
+
+  /* SUBTEXT */
+  helperWrap: {
+    width: '100%', // ⟵ viktigt
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  helperTop: {
+    fontSize: 12,
+    color: '#304A76',
+    textAlign: 'center',
+    alignSelf: 'stretch',
+  },
+  helperBottom: {
+    fontSize: 12,
+    color: '#6B7280',
+    textAlign: 'center',
+    alignSelf: 'stretch',
+  },
+
+  /* FEATURES */
+  featuresWrap: {
+    width: '100%',
+    maxWidth: 560,
+    marginTop: 20,
   },
 });
