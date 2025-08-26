@@ -23,7 +23,6 @@ const HomeScreen: React.FC = () => {
             accessibilityLabel="MindSteps logotyp"
           />
           <Text style={styles.tagline}>one step closer to a better mind</Text>
-          <Text>MindSteps 👣</Text>
         </View>
 
         <View style={styles.buttonWrap}>
