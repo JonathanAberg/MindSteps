@@ -70,16 +70,16 @@ function Feature({
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'center',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 24,
     marginTop: 20,
   },
   item: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'flex-start',
     paddingVertical: 8,
-    borderRadius: 14,
-    marginHorizontal: 10,
   },
   itemPressed: {
     opacity: 0.6,
