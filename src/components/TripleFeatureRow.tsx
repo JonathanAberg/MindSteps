@@ -8,7 +8,7 @@ export type TripleFeatureRowProps = {
   onPressStats?: () => void;
 };
 
-const COLOR_PRIMARY = '#2876D3';
+const COLOR_PRIMARY = '#5D8FC9';
 
 export default function TripleFeatureRow({
   onPressReflections,

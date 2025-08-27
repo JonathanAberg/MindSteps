@@ -59,6 +59,7 @@ const styles = StyleSheet.create({
     width: 250,
     height: 250,
     marginBottom: -40, // ⟵ dra upp logotypen lite
+    tintColor: '#689FE0', // <-- färga loggan
   },
 
   tagline: {
