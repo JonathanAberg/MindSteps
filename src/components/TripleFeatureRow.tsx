@@ -62,7 +62,11 @@ function Feature({
       accessibilityLabel={accessibilityLabel || label.replace('\n', ' ')}
     >
       <View style={styles.iconWrap}>{icon}</View>
-      <Text style={styles.label}>{label}</Text>
+      <View style={styles.labelBox}>
+        <Text style={styles.label} numberOfLines={2} ellipsizeMode="tail">
+          {label}
+        </Text>
+      </View>
     </Pressable>
   );
 }
@@ -70,7 +74,7 @@ function Feature({
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
     paddingHorizontal: 24,
     marginTop: 20,
@@ -86,6 +90,11 @@ const styles = StyleSheet.create({
   },
   iconWrap: {
     marginBottom: 8,
+  },
+  labelBox: {
+    minHeight: 36,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
   },
   label: {
     textAlign: 'center',
