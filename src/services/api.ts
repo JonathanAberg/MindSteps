@@ -30,18 +30,6 @@ export const fetchSessionById = async (id: string) => {
   }
 };
 
-// Update a session
-// export const updateSession = async (id: string, session: SessionProps) => {
-//   try {
-//     const response = await api.put(`/sessions/${id}`, session);
-//     return response.data;
-//   } catch (error) {
-//     console.error(`Error updating session with ID ${id}:`, error);
-//     throw new Error("Failed to update session.");
-//   }
-// };
-
-// Delete a session
 export const deleteSession = async (id: string) => {
   try {
     const response = await api.delete(`/sessions/${id}`);
