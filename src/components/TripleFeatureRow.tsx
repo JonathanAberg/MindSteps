@@ -1,44 +1,48 @@
 import React from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons, Feather } from '@expo/vector-icons';
 
 export type TripleFeatureRowProps = {
-  onPressReflections?: () => void;
-  onPressRecordings?: () => void;
-  onPressStats?: () => void;
+  title?: string; // rubrik ovanför
 };
 
 const COLOR_PRIMARY = '#5D8FC9';
+const ICON_SIZE = 30;
 
-export default function TripleFeatureRow({
-  onPressReflections,
-  onPressRecordings,
-  onPressStats,
-}: TripleFeatureRowProps) {
+export default function TripleFeatureRow({ title = 'Vad appen erbjuder' }: TripleFeatureRowProps) {
   return (
     <View style={styles.container}>
-      <Feature
-        accessibilityLabel="Reflektionsfrågor"
-        icon={
-          <MaterialCommunityIcons name="thought-bubble-outline" size={50} color={COLOR_PRIMARY} />
-        }
-        label={'Reflektions-\nfrågor'}
-        onPress={onPressReflections}
-      />
+      {!!title && (
+        <Text style={styles.title} accessibilityRole="header">
+          {title}
+        </Text>
+      )}
 
-      <Feature
-        accessibilityLabel="Mina inspelningar"
-        icon={<Feather name="mic" size={50} color={COLOR_PRIMARY} />}
-        label={'Mina\ninspelningar'}
-        onPress={onPressRecordings}
-      />
+      <View style={styles.row}>
+        <Feature
+          accessibilityLabel="Reflektionsfrågor under promenader"
+          icon={
+            <MaterialCommunityIcons
+              name="thought-bubble-outline"
+              size={ICON_SIZE}
+              color={COLOR_PRIMARY}
+            />
+          }
+          label={'Reflektions-\nfrågor under promenader'}
+        />
 
-      <Feature
-        accessibilityLabel="Statistik"
-        icon={<Feather name="bar-chart-2" size={50} color={COLOR_PRIMARY} />}
-        label="Statistik"
-        onPress={onPressStats}
-      />
+        <Feature
+          accessibilityLabel="Mina inspelningar"
+          icon={<Feather name="mic" size={ICON_SIZE} color={COLOR_PRIMARY} />}
+          label={'Spela in\ntankar'}
+        />
+
+        <Feature
+          accessibilityLabel="Statistik"
+          icon={<Feather name="bar-chart-2" size={ICON_SIZE} color={COLOR_PRIMARY} />}
+          label="Få tillgång till statistik"
+        />
+      </View>
     </View>
   );
 }
@@ -46,47 +50,59 @@ export default function TripleFeatureRow({
 function Feature({
   icon,
   label,
-  onPress,
   accessibilityLabel,
 }: {
   icon: React.ReactNode;
   label: string;
-  onPress?: () => void;
   accessibilityLabel?: string;
 }) {
   return (
-    <Pressable
-      style={({ pressed }) => [styles.item, pressed && styles.itemPressed]}
-      onPress={onPress}
-      accessibilityRole="button"
+    <View
+      style={styles.item}
+      accessible
+      accessibilityRole="text"
       accessibilityLabel={accessibilityLabel || label.replace('\n', ' ')}
+      importantForAccessibility="no-hide-descendants"
     >
-      <View style={styles.iconWrap}>{icon}</View>
+      <View
+        style={styles.iconWrap}
+        accessibilityElementsHidden
+        importantForAccessibility="no"
+        pointerEvents="none"
+      >
+        {icon}
+      </View>
       <View style={styles.labelBox}>
-        <Text style={styles.label} numberOfLines={2} ellipsizeMode="tail">
+        <Text style={styles.label} numberOfLines={3} ellipsizeMode="tail">
           {label}
         </Text>
       </View>
-    </Pressable>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    paddingHorizontal: 24,
+    marginTop: 20,
+  },
+  title: {
+    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 8,
+    color: '#304A76',
+  },
+  row: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
-    paddingHorizontal: 24,
-    marginTop: 20,
   },
   item: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'flex-start',
     paddingVertical: 8,
-  },
-  itemPressed: {
-    opacity: 0.6,
   },
   iconWrap: {
     marginBottom: 8,
@@ -99,8 +115,7 @@ const styles = StyleSheet.create({
   label: {
     textAlign: 'center',
     color: COLOR_PRIMARY,
-    fontSize: 14,
-    lineHeight: 18,
-    fontWeight: '500',
+    fontSize: 12,
+    fontWeight: '400',
   },
 });
