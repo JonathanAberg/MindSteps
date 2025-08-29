@@ -1,6 +1,9 @@
-import React from "react";
+import React, {useState} from "react";
 import { SafeAreaView, Text, StyleSheet } from "react-native";
-
+import QuestionDisplay from "@/components/QuestionDisplay";
+import {useGetQuestionByCategory} from "@/hooks/questions/useGetQuestionsByCategory";
+import { useEffect } from "react";
+import apiClient from "@/api/client";
 /**
  * Efter man tryckt på "Starta promenad" på Home screen och i den overlayn
  * valt att få frågor eller ej så kommer man hit.
@@ -14,9 +17,46 @@ import { SafeAreaView, Text, StyleSheet } from "react-native";
  */
 
 const DuringWalkScreen: React.FC = () => {
+
+  const category = "Fokus";
+  const {data, loading, error} = useGetQuestionByCategory(category);
+
+  useEffect(() => {
+  (async () => {
+    try {
+      const res = await apiClient.get("/questions/category/Fokus");
+      console.log("✅ API OK, antal frågor:", res.data?.length);
+    } catch (e: any) {
+      console.log("❌ API fel:", e.message, e.response?.status);
+    }
+  })();
+}, []);
+
+  const [index, setIndex] = useState(0);
+  const count = data?.length ?? 0;
+
+  const next = () => {
+    if (!count) return;
+    setIndex((i) => (i + 1) % count);
+  };
+
+const prev = () => {
+  if(!count) return;
+  setIndex((i) => (i - 1 + count) % count);
+};
+
+if(loading) return <SafeAreaView style={styles.container}><Text>Laddar...</Text></SafeAreaView>;
+if (error) return <SafeAreaView style={styles.container}><Text>Något gick fel.</Text></SafeAreaView>;
+if (!count) return <SafeAreaView style={styles.container}><Text>Inga frågor i {category}</Text></SafeAreaView>
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>During Walk</Text>
+      <QuestionDisplay
+        question={data![index]}
+        onPrev={prev}
+        onNext={next}
+        />
+
 
       {/*
         Här ska det ligga en component <StopWatch /> som tickar under pågående promenad

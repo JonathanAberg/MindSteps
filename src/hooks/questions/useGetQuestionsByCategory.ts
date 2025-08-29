@@ -17,7 +17,7 @@ export function useGetQuestionByCategory(category: string) {
     setError(null);
 
     apiClient
-    .get<Question[]>('/questions/category/${encodeURIComponent(category)}')
+    .get<Question[]>(`/questions/category/${encodeURIComponent(category)}`)
     .then((res) => mounted && setData(res.data))
     .catch((err) => mounted && setError(err))
     .finally(() => mounted && setLoading(false));
