@@ -12,8 +12,10 @@ import {
 } from 'react-native';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker'; // npm i @react-native-community/datetimepicker
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
 export default function SettingsScreen() {
+  const navigation = useNavigation();
   const [pushEnabled, setPushEnabled] = useState<boolean>(true);
   const [reminderEnabled, setReminderEnabled] = useState<boolean>(true);
   const [time, setTime] = useState<Date>(new Date(0, 0, 0, 18, 0)); // 18:00
@@ -56,7 +58,11 @@ export default function SettingsScreen() {
     <SafeAreaView style={styles.safe}>
       {/* Header */}
       <View style={styles.headerRow}>
-        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Tillbaka">
+        <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel="Tillbaka"
+          onPress={() => navigation.goBack()}
+        >
           <Text style={styles.backIcon}>‹</Text>
         </TouchableOpacity>
         <Text style={styles.screenTitle}>Inställningar</Text>
