@@ -20,6 +20,12 @@ jest.mock('@expo-google-fonts/montserrat', () => ({
   Montserrat_700Bold: 'Montserrat_700Bold',
 }));
 
+// Mock AnnieUseYourTelescope for HomeScreen
+jest.mock('@expo-google-fonts/annie-use-your-telescope', () => ({
+  useFonts: () => [true],
+  AnnieUseYourTelescope_400Regular: 'AnnieUseYourTelescope_400Regular',
+}));
+
 // Mock deviceId so deviceReady is always true
 jest.mock('../src/utils/deviceId', () => ({
   getOrInitDeviceId: jest.fn(() => Promise.resolve('test-device-id')),
