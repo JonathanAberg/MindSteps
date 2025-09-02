@@ -11,17 +11,26 @@ import OverlayOne, { type ThumbChoice } from './OverlayOne';
 import OverlayTwo, { type Category, type QuestionInterval } from './OverlayTwo';
 import OverlayThree from './OverlayThree';
 import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+// Definiera stack-parametrarna
+type RootStackParamList = {
+  StartScreen: undefined;
+  DuringWalkScreen: {
+    prefs: { cats: Category[]; interval: QuestionInterval } | null;
+  };
+};
+
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'StartScreen'>;
 
 type Props = { onPress?: () => void };
 type Step = 'none' | 'one' | 'two' | 'three';
 
 export default function StartWalkButton({ onPress }: Props): ReactElement {
   const [step, setStep] = useState<Step>('none');
-
-  // Använd faktiskt prefs: vi skickar det vidare vid navigate
   const [prefs, setPrefs] = useState<{ cats: Category[]; interval: QuestionInterval } | null>(null);
 
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp>();
 
   const handlePress = () => {
     setStep('one');
@@ -39,8 +48,7 @@ export default function StartWalkButton({ onPress }: Props): ReactElement {
   };
 
   const handleConfirmAll = () => {
-    // Skicka med prefs (kan vara null om användaren hoppat över val)
-    navigation.navigate('DuringWalkScreen' as never, { prefs } as never);
+    navigation.navigate('DuringWalkScreen', { prefs });
     setStep('none');
   };
 
@@ -60,14 +68,14 @@ export default function StartWalkButton({ onPress }: Props): ReactElement {
       <OverlayTwo
         visible={step === 'two'}
         onConfirm={handleConfirmPrefs}
-        onCancel={() => setStep('one')} // Tillbaka
+        onCancel={() => setStep('one')}
         onBackdropPress={() => setStep('none')}
       />
 
       <OverlayThree
         visible={step === 'three'}
         onConfirmAll={handleConfirmAll}
-        onBack={() => setStep('two')} // Tillbaka
+        onBack={() => setStep('two')}
         onBackdropPress={() => setStep('none')}
       />
     </View>
