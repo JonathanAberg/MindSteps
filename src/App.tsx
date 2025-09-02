@@ -2,7 +2,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer, DefaultTheme, Theme } from '@react-navigation/native';
-import MainTabs from './navigation/MainTabs';
+import AppNavigator from './navigation/AppNavigator';
 import { getOrInitDeviceId } from './utils/deviceId';
 import { Text as RNText } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
@@ -74,7 +74,7 @@ export default function App() {
 
   return (
     <NavigationContainer theme={theme} onReady={onLayoutRootView}>
-      <MainTabs />
+      <AppNavigator />
       <StatusBar style="auto" />
     </NavigationContainer>
   );
