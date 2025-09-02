@@ -18,6 +18,7 @@ type Step = 'none' | 'one' | 'two' | 'three';
 export default function StartWalkButton({ onPress }: Props): ReactElement {
   const [step, setStep] = useState<Step>('none');
 
+  // Använd faktiskt prefs: vi skickar det vidare vid navigate
   const [prefs, setPrefs] = useState<{ cats: Category[]; interval: QuestionInterval } | null>(null);
 
   const navigation = useNavigation();
@@ -38,8 +39,8 @@ export default function StartWalkButton({ onPress }: Props): ReactElement {
   };
 
   const handleConfirmAll = () => {
-    // kicka med prefs: navigation.navigate('DuringWalkScreen', { prefs })
-    navigation.navigate('DuringWalkScreen' as never);
+    // Skicka med prefs (kan vara null om användaren hoppat över val)
+    navigation.navigate('DuringWalkScreen' as never, { prefs } as never);
     setStep('none');
   };
 
