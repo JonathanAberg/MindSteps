@@ -13,7 +13,7 @@
     "paths": {
       "@/*": ["src/*"]
     },
-    "types": ["react", "react-native"]
+    "types": ["react", "react-native", "node"]
   },
   "include": ["src", "types", "App.tsx", "app.config.ts", "app.json"],
   "exclude": ["node_modules"],
