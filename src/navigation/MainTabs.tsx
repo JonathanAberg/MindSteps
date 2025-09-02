@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from '@/screens/HomeScreen';
 import HistoryScreen from '@/screens/HistoryScreen';
 import SettingsScreen from '@/screens/SettingsScreen';
-import NoteScreen from '@/screens/NoteScreen';
+import InfoScreen from '@/screens/InfoScreen';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
 const Tab = createBottomTabNavigator();
@@ -19,8 +19,8 @@ const MainTabs = () => {
             iconName = 'home';
           } else if (route.name === 'Historik') {
             iconName = 'history';
-          } else if (route.name === 'Notiser') {
-            iconName = 'bell';
+          } else if (route.name === 'Info') {
+            iconName = 'info-circle';
           } else if (route.name === 'Inställningar') {
             iconName = 'cog';
           }
@@ -34,7 +34,7 @@ const MainTabs = () => {
     >
       <Tab.Screen name="Hem" component={HomeScreen} />
       <Tab.Screen name="Historik" component={HistoryScreen} />
-      <Tab.Screen name="Notiser" component={NoteScreen} />
+      <Tab.Screen name="Info" component={InfoScreen} />
       <Tab.Screen name="Inställningar" component={SettingsScreen} />
     </Tab.Navigator>
   );
