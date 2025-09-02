@@ -7,22 +7,39 @@ import {
   type ViewStyle,
   type TextStyle,
 } from 'react-native';
-import OverlayOne from './OverlayOne';
+import OverlayOne, { type ThumbChoice } from './OverlayOne';
 import OverlayTwo, { type Category, type QuestionInterval } from './OverlayTwo';
+import OverlayThree from './OverlayThree';
+import { useNavigation } from '@react-navigation/native';
 
 type Props = { onPress?: () => void };
-type Step = 'none' | 'one' | 'two';
+type Step = 'none' | 'one' | 'two' | 'three';
 
 export default function StartWalkButton({ onPress }: Props): ReactElement {
   const [step, setStep] = useState<Step>('none');
 
+  const [prefs, setPrefs] = useState<{ cats: Category[]; interval: QuestionInterval } | null>(null);
+
+  const navigation = useNavigation();
+
   const handlePress = () => {
-    setStep('one'); // öppna första overlayn
+    setStep('one');
     onPress?.();
   };
 
-  const handleConfirm = (cats: Category[], interval: QuestionInterval) => {
-    // spara/starta flödet
+  const handleOverlayOneConfirm = (choice: ThumbChoice) => {
+    if (choice === 'up') setStep('two');
+    else setStep('three');
+  };
+
+  const handleConfirmPrefs = (cats: Category[], interval: QuestionInterval) => {
+    setPrefs({ cats, interval });
+    setStep('three');
+  };
+
+  const handleConfirmAll = () => {
+    // kicka med prefs: navigation.navigate('DuringWalkScreen', { prefs })
+    navigation.navigate('DuringWalkScreen' as never);
     setStep('none');
   };
 
@@ -34,16 +51,22 @@ export default function StartWalkButton({ onPress }: Props): ReactElement {
 
       <OverlayOne
         visible={step === 'one'}
-        onAccept={() => setStep('two')} // gå till andra overlayn
-        onDecline={() => setStep('none')}
+        onConfirm={handleOverlayOneConfirm}
+        onCancel={() => setStep('none')}
         onBackdropPress={() => setStep('none')}
       />
 
-      {/* Overlay 2 (preferences) */}
       <OverlayTwo
         visible={step === 'two'}
-        onConfirm={handleConfirm}
-        onCancel={() => setStep('none')}
+        onConfirm={handleConfirmPrefs}
+        onCancel={() => setStep('one')} // Tillbaka
+        onBackdropPress={() => setStep('none')}
+      />
+
+      <OverlayThree
+        visible={step === 'three'}
+        onConfirmAll={handleConfirmAll}
+        onBack={() => setStep('two')} // Tillbaka
         onBackdropPress={() => setStep('none')}
       />
     </View>

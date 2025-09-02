@@ -1,7 +1,7 @@
 import React, { useEffect, useState, type ReactElement } from 'react';
 import { Modal, View, Text, Pressable, TouchableOpacity, StyleSheet } from 'react-native';
 
-// 🔹 Exportera typer så andra filer kan använda dem
+// Exportera typer så andra filer kan använda dem
 export type Category = 'oro' | 'fokus' | 'slapp' | 'planering' | 'reflekterande' | 'filosofiska';
 
 export type QuestionInterval = 15 | 30 | 'once';
@@ -89,7 +89,7 @@ export default function OverlayTwo({
                   <Text style={styles.emoji}>{emoji}</Text>
                   <Text
                     style={[styles.categoryLabel, selected && styles.categoryLabelSelected]}
-                    numberOfLines={1}
+                    adjustsFontSizeToFit
                   >
                     {label}
                   </Text>
@@ -98,9 +98,7 @@ export default function OverlayTwo({
             })}
           </View>
 
-          <Text style={[styles.heading, { marginTop: 12 }]}>
-            Vilket intervall vill du att{'\n'}frågorna ställs?
-          </Text>
+          <Text style={[styles.heading]}>Vilket intervall vill du att{'\n'}frågorna ställs?</Text>
 
           <View style={styles.intervalRow}>
             {INTERVALS.map(({ key, label }) => {
@@ -127,7 +125,7 @@ export default function OverlayTwo({
 
           <View style={styles.footer}>
             <TouchableOpacity onPress={onCancel}>
-              <Text style={styles.cancel}>Avbryt</Text>
+              <Text style={styles.cancel}>Tillbaka</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -135,7 +133,7 @@ export default function OverlayTwo({
               disabled={!canConfirm}
               style={[styles.cta, !canConfirm && styles.ctaDisabled]}
             >
-              <Text style={styles.ctaText}>Bekräfta</Text>
+              <Text style={styles.ctaText}>Gå vidare</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -178,6 +176,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     color: '#222',
     marginBottom: 8,
+    marginTop: 12,
   },
   grid: {
     marginTop: 6,
@@ -191,6 +190,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     alignItems: 'center',
     paddingVertical: 10,
+    paddingHorizontal: 0,
     marginBottom: 10,
     shadowColor: '#000',
     shadowOpacity: 0.08,
@@ -203,9 +203,10 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: TEXT_PRIMARY,
   },
-  emoji: { fontSize: 26, marginBottom: 6 },
+  emoji: { fontSize: 26, marginBottom: 4 },
   categoryLabel: {
-    fontSize: 13,
+    fontSize: 12,
+    lineHeight: 16,
     color: TEXT_PRIMARY,
     textAlign: 'center',
   },
@@ -222,6 +223,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     width: '31%',
     alignItems: 'center',
+    minHeight: 72,
   },
   intervalChipSelected: {
     backgroundColor: LIGHT_SELECTED,
@@ -236,7 +238,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  cancel: { color: TEXT_PRIMARY, fontSize: 15 },
+  cancel: {
+    color: TEXT_PRIMARY,
+    fontSize: 15,
+    paddingHorizontal: 15,
+    paddingVertical: 6,
+  },
   cta: {
     backgroundColor: TEXT_PRIMARY,
     paddingVertical: 10,

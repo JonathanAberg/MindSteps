@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, View, Text, Pressable, TouchableOpacity, StyleSheet } from 'react-native';
 import Feather from '@expo/vector-icons/Feather';
 
@@ -6,17 +6,16 @@ export type ThumbChoice = 'up' | 'down';
 
 type Props = {
   visible: boolean;
-  onConfirm: (choice: ThumbChoice) => void; // Bekräfta med valt alternativ
-  onCancel: () => void; // Avbryt
+  onConfirmAll: (choice: ThumbChoice) => void; // Bekräfta val
+  onBack: () => void; // Tillbaka till OverlayTwo
   onBackdropPress?: () => void;
 };
 
-export default function OverlayOne({ visible, onConfirm, onCancel, onBackdropPress }: Props) {
+export default function OverlayThree({ visible, onConfirmAll, onBack, onBackdropPress }: Props) {
   const [choice, setChoice] = useState<ThumbChoice | null>(null);
 
-  // rensa val när modalen öppnas/stängs
-  React.useEffect(() => {
-    if (visible) setChoice(null);
+  useEffect(() => {
+    if (visible) setChoice(null); // reset när modal öppnas
   }, [visible]);
 
   const canConfirm = choice !== null;
@@ -26,9 +25,9 @@ export default function OverlayOne({ visible, onConfirm, onCancel, onBackdropPre
       <Pressable style={styles.backdrop} onPress={onBackdropPress} />
       <View style={styles.centerWrap} pointerEvents="box-none">
         <View style={styles.card} accessibilityViewIsModal>
-          <Text style={styles.title}>Vill du ha reflektionsfrågor{'\n'}under din promenad?</Text>
+          <Text style={styles.title}>Vill du tracka din promenad?</Text>
 
-          {/* Val: tummar fungerar som toggles (kräver ett val) */}
+          {/* Val med tummar */}
           <View style={styles.actions}>
             <Pressable
               onPress={() => setChoice('up')}
@@ -39,7 +38,6 @@ export default function OverlayOne({ visible, onConfirm, onCancel, onBackdropPre
               ]}
               accessibilityRole="radio"
               accessibilityState={{ selected: choice === 'up' }}
-              android_ripple={{ borderless: true }}
               testID="thumbs-up"
             >
               <Feather name="thumbs-up" size={28} />
@@ -55,7 +53,6 @@ export default function OverlayOne({ visible, onConfirm, onCancel, onBackdropPre
               ]}
               accessibilityRole="radio"
               accessibilityState={{ selected: choice === 'down' }}
-              android_ripple={{ borderless: true }}
               testID="thumbs-down"
             >
               <Feather name="thumbs-down" size={28} />
@@ -63,18 +60,18 @@ export default function OverlayOne({ visible, onConfirm, onCancel, onBackdropPre
             </Pressable>
           </View>
 
-          {/* Footer med Avbryt / Gå vidare (disabled om inget valt) */}
+          {/* Footer med Tillbaka / Bekräfta */}
           <View style={styles.footer}>
-            <TouchableOpacity onPress={onCancel}>
-              <Text style={styles.cancel}>Avbryt</Text>
+            <TouchableOpacity onPress={onBack}>
+              <Text style={styles.cancel}>Tillbaka</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => choice && onConfirm(choice)}
+              onPress={() => choice && onConfirmAll(choice)}
               disabled={!canConfirm}
               style={[styles.cta, !canConfirm && styles.ctaDisabled]}
             >
-              <Text style={styles.ctaText}>Gå vidare</Text>
+              <Text style={styles.ctaText}>Bekräfta</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -103,15 +100,11 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   title: { textAlign: 'center', fontSize: 16, lineHeight: 22, color: '#222' },
-  actions: {
-    marginTop: 14,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 28,
-  },
+  actions: { marginTop: 14, flexDirection: 'row', justifyContent: 'center', gap: 28 },
   iconBtn: {
     alignItems: 'center',
     padding: 10,
+    borderRadius: 12,
     minWidth: 80,
   },
   iconBtnSelected: { backgroundColor: LIGHT_SELECTED, borderColor: TEXT_PRIMARY, borderRadius: 50 },
