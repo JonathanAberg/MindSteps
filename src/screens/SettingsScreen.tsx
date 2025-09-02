@@ -58,13 +58,6 @@ export default function SettingsScreen() {
     <SafeAreaView style={styles.safe}>
       {/* Header */}
       <View style={styles.headerRow}>
-        <TouchableOpacity
-          accessibilityRole="button"
-          accessibilityLabel="Tillbaka"
-          onPress={() => navigation.goBack()}
-        >
-          <Text style={styles.backIcon}>‹</Text>
-        </TouchableOpacity>
         <Text style={styles.screenTitle}>Inställningar</Text>
         <View style={styles.spacer24} />
       </View>
