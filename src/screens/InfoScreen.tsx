@@ -54,20 +54,54 @@ const InfoScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#fff' },
-  container: { padding: 20, paddingBottom: 32 },
-  title: { fontSize: 24, marginBottom: 6, color: '#304A76', fontFamily: 'Montserrat_700Bold' },
-  lead: { fontSize: 16, color: '#7E9CD2', fontFamily: 'Montserrat_500Medium' },
-  hr: { height: 1, backgroundColor: '#eee', marginVertical: 16 },
-  sectionTitle: { fontSize: 14, marginBottom: 4, color: '#304A76' },
-  sectionText: { fontSize: 12, color: '#304A76' },
+  safe: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  container: {
+    padding: 16,
+    paddingBottom: 80,
+  },
+  title: {
+    fontSize: 24,
+    marginBottom: 8,
+    color: '#304A76',
+    fontFamily: 'Montserrat_700Bold',
+  },
+  lead: {
+    fontSize: 16,
+    color: '#7E9CD2',
+    fontFamily: 'Montserrat_500Medium',
+  },
+  hr: {
+    height: 1,
+    backgroundColor: '#eee',
+    marginVertical: 16,
+  },
+  section: {
+    marginBottom: 24,
+    padding: 10,
+  },
+  sectionTitle: {
+    fontSize: 14,
+    marginBottom: 4,
+    color: '#304A76',
+  },
+  sectionText: {
+    fontSize: 12,
+    color: '#304A76',
+  },
   note: {
     backgroundColor: '#f3f7ff',
     padding: 12,
     borderRadius: 12,
     marginTop: 4,
   },
-  noteText: { fontSize: 14, color: '#304A76', fontFamily: 'Montserrat_700Bold' },
+  noteText: {
+    fontSize: 14,
+    color: '#304A76',
+    fontFamily: 'Montserrat_700Bold',
+  },
 });
 
 export default InfoScreen;
