@@ -12,8 +12,9 @@ const MainTabs = () => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
+        // eslint-disable-next-line react/no-unstable-nested-components
         tabBarIcon: ({ color, size }) => {
-          let iconName;
+          let iconName: string = 'home';
 
           if (route.name === 'Hem') {
             iconName = 'home';
@@ -27,6 +28,13 @@ const MainTabs = () => {
 
           return <Icon name={iconName} size={size} color={color} />;
         },
+
+        // Montserrat i rubrikerna
+        headerTitleStyle: { fontFamily: 'Montserrat_700Bold' },
+
+        // Montserrat i tab-labels
+        tabBarLabelStyle: { fontFamily: 'Montserrat_500Medium' },
+
         tabBarActiveTintColor: 'grey',
         tabBarInactiveTintColor: 'black',
         tabBarLabelPosition: 'below-icon',

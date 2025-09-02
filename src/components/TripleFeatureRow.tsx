@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   title: {
     textAlign: 'center',
     fontSize: 16,
-    fontWeight: '600',
+    fontFamily: 'Montserrat_500Medium',
     marginBottom: 8,
     color: '#304A76',
   },
@@ -116,6 +116,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: COLOR_PRIMARY,
     fontSize: 12,
-    fontWeight: '400',
+    fontFamily: 'Montserrat_500Medium',
   },
 });

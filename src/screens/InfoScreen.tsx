@@ -56,11 +56,10 @@ const InfoScreen: React.FC = () => {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: '#fff' },
   container: { padding: 20, paddingBottom: 32 },
-  title: { fontSize: 24, fontWeight: '700', marginBottom: 6, color: '#304A76' },
-  lead: { fontSize: 16, color: '#7E9CD2' },
+  title: { fontSize: 24, marginBottom: 6, color: '#304A76', fontFamily: 'Montserrat_700Bold' },
+  lead: { fontSize: 16, color: '#7E9CD2', fontFamily: 'Montserrat_500Medium' },
   hr: { height: 1, backgroundColor: '#eee', marginVertical: 16 },
-  section: { marginBottom: 14 },
-  sectionTitle: { fontSize: 14, fontWeight: '600', marginBottom: 4, color: '#304A76' },
+  sectionTitle: { fontSize: 14, marginBottom: 4, color: '#304A76' },
   sectionText: { fontSize: 12, color: '#304A76' },
   note: {
     backgroundColor: '#f3f7ff',
@@ -68,7 +67,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginTop: 4,
   },
-  noteText: { fontSize: 14, color: '#304A76' },
+  noteText: { fontSize: 14, color: '#304A76', fontFamily: 'Montserrat_700Bold' },
 });
 
 export default InfoScreen;

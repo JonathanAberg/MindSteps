@@ -89,12 +89,14 @@ const styles = StyleSheet.create({
     color: '#304A76',
     textAlign: 'center',
     alignSelf: 'stretch',
+    fontFamily: 'Montserrat_500Medium',
   },
   helperBottom: {
     fontSize: 12,
     color: '#6B7280',
     textAlign: 'center',
     alignSelf: 'stretch',
+    fontFamily: 'Montserrat_500Medium',
   },
 
   /* FEATURES */

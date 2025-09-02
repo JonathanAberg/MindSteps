@@ -54,13 +54,6 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      {/* Header */}
-      <View style={styles.headerRow}>
-        <Text style={styles.screenTitle}>Inställningar</Text>
-        <View style={styles.spacer24} />
-      </View>
-
-      {/* Innehåll (utan ScrollView) */}
       <View style={styles.content}>
         {/* Kort: Notiser */}
         <View style={styles.card}>
@@ -165,8 +158,13 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   },
   spacer24: { width: 24 },
-  backIcon: { fontSize: 28, color: TEXT, width: 24, textAlign: 'center' },
-  screenTitle: { flex: 1, fontSize: 28, fontWeight: '800', color: TITLE_BLUE, marginLeft: 8 },
+  screenTitle: {
+    flex: 1,
+    fontSize: 28,
+    color: TITLE_BLUE,
+    marginLeft: 8,
+    fontFamily: 'Montserrat_700Bold',
+  },
 
   content: { flex: 1, padding: 16, paddingBottom: 32 },
 
@@ -174,6 +172,7 @@ const styles = StyleSheet.create({
     backgroundColor: CARD,
     borderRadius: 16,
     padding: 16,
+    marginTop: 30,
     shadowColor: '#000',
     shadowOpacity: 0.12,
     shadowRadius: 8,
@@ -183,11 +182,17 @@ const styles = StyleSheet.create({
 
   row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   rowTop: { marginTop: 14 },
-  cardTitle: { fontSize: 18, fontWeight: '700', color: TEXT },
+  cardTitle: { fontSize: 18, color: TEXT, fontFamily: 'Montserrat_500Medium' },
 
   // Tid-raden – texten får inte krympas; pillen skjuts till höger
   timeRow: { flexDirection: 'row', alignItems: 'center', marginTop: 12 },
-  timeText: { color: '#000000', fontSize: 18, marginRight: 8, flexShrink: 0 },
+  timeText: {
+    color: '#000000',
+    fontSize: 18,
+    marginRight: 8,
+    flexShrink: 0,
+    fontFamily: 'Montserrat_500Medium',
+  },
   pushRight: { marginLeft: 'auto' },
 
   timePill: {
@@ -196,21 +201,21 @@ const styles = StyleSheet.create({
     backgroundColor: PILL_BG,
     borderRadius: 8,
   },
-  timePillText: { fontWeight: '700', color: BLUE_TEXT, fontSize: 14 },
+  timePillText: { color: BLUE_TEXT, fontSize: 14, fontFamily: 'Montserrat_700Bold' },
   timePillDisabled: { opacity: 0.5 },
 
   // Spacer som trycker ner Data-delen
   flexSpacer: { flex: 1 },
 
   sectionTitle: {
-    marginTop: 20,
     marginBottom: 10,
     fontSize: 22,
-    fontWeight: '800',
     color: TITLE_BLUE,
+    fontFamily: 'Montserrat_700Bold',
   },
 
   warningCard: {
+    marginBottom: 20,
     backgroundColor: CARD,
     borderRadius: 16,
     padding: 16,
@@ -220,10 +225,9 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 3 },
     elevation: 4,
   },
-  warningText: { color: '#374151', lineHeight: 20 },
+  warningText: { color: '#374151', lineHeight: 20, fontFamily: 'Montserrat_500Medium' },
 
   dangerCardButton: {
-    marginTop: 14,
     backgroundColor: CARD,
     borderRadius: 16,
     paddingVertical: 14,
@@ -233,8 +237,9 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 3 },
     elevation: 4,
+    marginBottom: 20,
   },
-  dangerCardButtonText: { color: '#E16464', fontWeight: '700' },
+  dangerCardButtonText: { color: '#E16464', fontFamily: 'Montserrat_700Bold' },
 
   modalBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.35)', justifyContent: 'flex-end' },
   modalSheet: {

@@ -96,5 +96,5 @@ const styles = StyleSheet.create<{
     alignItems: 'center',
     justifyContent: 'center',
   },
-  buttonText: { color: '#304A76', fontSize: 18, fontWeight: 'bold' },
+  buttonText: { color: '#304A76', fontSize: 18, fontFamily: 'Montserrat_700Bold' },
 });
