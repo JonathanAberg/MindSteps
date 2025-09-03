@@ -1,5 +1,8 @@
 // App.tsx
 import React, { useCallback, useEffect, useState } from 'react';
+import OverlayPushPermission from './components/OverlayPushPermission';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Notifications from 'expo-notifications';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer, DefaultTheme, Theme } from '@react-navigation/native';
 import MainTabs from './navigation/MainTabs';
@@ -26,6 +29,7 @@ export const getDeviceId = () => deviceIdGlobal;
 
 export default function App() {
   const [deviceReady, setDeviceReady] = useState(false);
+  const [showPushOverlay, setShowPushOverlay] = useState(false);
 
   // 1) Ladda typsnitt
   const [fontsLoaded] = useFonts({
@@ -40,6 +44,16 @@ export default function App() {
       const id = await getOrInitDeviceId();
       deviceIdGlobal = id;
       setDeviceReady(true);
+    })();
+  }, []);
+
+  // 2b) Kolla om push-permission är hanterad
+  useEffect(() => {
+    (async () => {
+      const handled = await AsyncStorage.getItem('pushPermissionHandled');
+      if (!handled) {
+        setShowPushOverlay(true);
+      }
     })();
   }, []);
 
@@ -72,10 +86,34 @@ export default function App() {
     return null;
   }
 
+  // Hantera push-permission overlay
+
+  const handleAllowPush = async () => {
+    setShowPushOverlay(false);
+    await AsyncStorage.setItem('pushPermissionHandled', 'true');
+    try {
+      await Notifications.requestPermissionsAsync();
+    } catch {
+      // Ignorera eventuella fel, t.ex. om permission redan är hanterad
+    }
+  };
+
+  const handleDenyPush = async () => {
+    setShowPushOverlay(false);
+    await AsyncStorage.setItem('pushPermissionHandled', 'true');
+  };
+
   return (
-    <NavigationContainer theme={theme} onReady={onLayoutRootView}>
-      <MainTabs />
-      <StatusBar style="auto" />
-    </NavigationContainer>
+    <>
+      <NavigationContainer theme={theme} onReady={onLayoutRootView}>
+        <MainTabs />
+        <StatusBar style="auto" />
+      </NavigationContainer>
+      <OverlayPushPermission
+        visible={showPushOverlay}
+        onAllow={handleAllowPush}
+        onDeny={handleDenyPush}
+      />
+    </>
   );
 }

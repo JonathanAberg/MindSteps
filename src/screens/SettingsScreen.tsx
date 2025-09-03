@@ -41,6 +41,7 @@ export default function SettingsScreen() {
           onPress: async () => {
             try {
               await AsyncStorage.clear();
+              await AsyncStorage.removeItem('pushPermissionHandled');
               setReminderEnabled(false);
               Alert.alert('Klart', 'Allt innehåll har raderats.');
             } catch {
