@@ -31,9 +31,7 @@ jest.mock('../src/utils/deviceId', () => ({
 test('renders Home as initial screen', async () => {
   render(
   <App/>);
-  screen.debug(); 
-
- screen.debug();
+ 
    await waitFor(() => {
     expect(screen.getByTestId('screen-home')).toBeTruthy();
   });
