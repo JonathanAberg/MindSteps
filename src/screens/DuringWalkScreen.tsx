@@ -3,6 +3,7 @@ import { SafeAreaView, Text, StyleSheet, View } from "react-native";
 import QuestionDisplay from "@/components/QuestionDisplay";
 import {useGetQuestionByCategory} from "@/hooks/questions/useGetQuestionsByCategory";
 import { useRoute, RouteProp } from "@react-navigation/native";
+import StopWatch from "@/components/StopWatch"
 
 /**
  * Efter man tryckt på "Starta promenad" på Home screen och i den overlayn
@@ -63,6 +64,20 @@ if (!count) return <SafeAreaView style={styles.container}><Text>Inga frågor i {
     <SafeAreaView style={styles.safe} >
       <View style={styles.container} testID="screen-duringwalk" >
 
+  <View style={{ width: '100%', alignItems: 'center', marginTop: 16 }}>
+  <StopWatch
+    autoStart
+    testID="stopwatch"
+    onSecondTick={(elapsedMs) => {
+      // Byt fråga varje 'interval' sekund (om du vill):
+      // if (elapsedMs > 0 && Math.floor(elapsedMs/1000) % interval === 0) next();
+    }}
+    onStop={(elapsedMs) => {
+      // Skicka vidare till LogWalk, spara i backend, etc.
+      // navigation.navigate('LogWalk', { elapsedMs })
+    }}
+  />
+</View>
       <Text style={styles.title}>Under Promenaden</Text>
       
       {/* Show selected preferences */}
@@ -73,11 +88,14 @@ if (!count) return <SafeAreaView style={styles.container}><Text>Inga frågor i {
       <Text style={styles.title}>During Walk</Text>
      
 
-      <QuestionDisplay
-        question={data![index]}
-        onPrev={prev}
-        onNext={next}
-        />
+    <QuestionDisplay
+  question={data![index]}
+  onPrev={prev}
+  onNext={next}
+  title={`Frågor om ${category}`}
+  index={index}
+  total={count}
+/>
        </View>
     </SafeAreaView>
   );
