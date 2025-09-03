@@ -17,9 +17,17 @@ export function useGetQuestionByCategory(category: string) {
     setError(null);
 
     apiClient
-    .get<Question[]>(`/questions/category/${encodeURIComponent(category.toLowerCase())}`)
+    .get<Question[]>(`/questions/category/${encodeURIComponent(category)}`)
     .then((res) => mounted && setData(res.data))
-    .catch((err) => mounted && setError(err))
+  .catch((err) => {
+        console.log(
+          "❌ API-fel:",
+          err?.message,
+          err?.response?.status,
+          err?.response?.data
+        );
+        if (mounted) setError(err);
+      })
     .finally(() => mounted && setLoading(false));
 
     return () => {mounted = false};

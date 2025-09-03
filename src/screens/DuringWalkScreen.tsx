@@ -37,7 +37,8 @@ const DuringWalkScreen: React.FC = () => {
   const prefs = route.params?.prefs;
   
   // Use the first category from preferences or default to "Fokus"
-  const category = prefs?.cats?.[0] || "Fokus";
+  const category = (prefs?.cats?.[0] || "fokus").toLowerCase();
+    console.log("🔎 Category skickas till hook:", category);
   
   // Get the interval (will be useful for automatic question cycling)
   const interval = prefs?.interval || 30;
@@ -67,7 +68,6 @@ if (!count) return <SafeAreaView style={styles.container}><Text>Inga frågor i {
   <View style={{ width: '100%', alignItems: 'center', marginTop: 16 }}>
   <StopWatch
     autoStart
-    testID="stopwatch"
     onSecondTick={(elapsedMs) => {
       // Byt fråga varje 'interval' sekund (om du vill):
       // if (elapsedMs > 0 && Math.floor(elapsedMs/1000) % interval === 0) next();
@@ -78,14 +78,14 @@ if (!count) return <SafeAreaView style={styles.container}><Text>Inga frågor i {
     }}
   />
 </View>
-      <Text style={styles.title}>Under Promenaden</Text>
+      
       
       {/* Show selected preferences */}
       <Text style={styles.subtitle}>
         Kategori: {category} • Intervall: {interval}s
       </Text>
 
-      <Text style={styles.title}>During Walk</Text>
+      
      
 
     <QuestionDisplay
