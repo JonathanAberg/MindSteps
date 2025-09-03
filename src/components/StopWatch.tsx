@@ -1,5 +1,5 @@
 // src/components/StopWatch.tsx
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, AppState } from 'react-native';
 
 type Props = {
@@ -17,37 +17,35 @@ export default function StopWatch({ autoStart = false, onStop, onSecondTick, tes
   const lastSecondRef = useRef<number>(0);
 
   // Starta/pausa/stopp
-  const start = () => {
-    if (running) return;
-    startedAtRef.current = Date.now();
-    setRunning(true);
-  };
+const start = useCallback(() => {
+  if (running) return;
+  startedAtRef.current = Date.now();
+  setRunning(true);
+}, [running]);
 
-  const pause = () => {
-    if (!running) return;
-    const now = Date.now();
-    if (startedAtRef.current) {
-      baseElapsedRef.current += now - startedAtRef.current;
-      startedAtRef.current = null;
-    }
-    setRunning(false);
-    // uppdatera elapsed en sista gång
-    setElapsed(baseElapsedRef.current);
-  };
-
-  const stop = () => {
-    // stop = pausa + callback
-    pause();
-    onStop?.(baseElapsedRef.current);
-  };
-
-  const reset = () => {
-    setRunning(false);
+const pause = useCallback(() => {
+  if (!running) return;
+  const now = Date.now();
+  if (startedAtRef.current) {
+    baseElapsedRef.current += now - startedAtRef.current;
     startedAtRef.current = null;
-    baseElapsedRef.current = 0;
-    lastSecondRef.current = 0;
-    setElapsed(0);
-  };
+  }
+  setRunning(false);
+  setElapsed(baseElapsedRef.current);
+}, [running]);
+
+const stop = useCallback(() => {
+  pause();
+  onStop?.(baseElapsedRef.current);
+}, [pause, onStop]);
+
+const reset = useCallback(() => {
+  setRunning(false);
+  startedAtRef.current = null;
+  baseElapsedRef.current = 0;
+  lastSecondRef.current = 0;
+  setElapsed(0);
+}, []);
 
   // Huvudtimer – låg drift via Date.now() (inte beroende av setInterval-drifts)
   useEffect(() => {
