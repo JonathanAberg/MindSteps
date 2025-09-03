@@ -1,7 +1,7 @@
 /// <reference types="jest" />
 /* eslint-env jest */
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react-native';
+import { render, screen } from '@testing-library/react-native';
 import App from '../src/App';
 
 
@@ -29,12 +29,7 @@ jest.mock('../src/utils/deviceId', () => ({
 }));
 
 test('renders Home as initial screen', async () => {
-  render(
-  <App/>);
- 
-   await waitFor(() => {
-    expect(screen.getByTestId('screen-home')).toBeTruthy();
-  });
+  render(<App />);
+  expect(await screen.findByTestId('screen-home')).toBeTruthy();
   expect(screen.queryByTestId('screen-duringwalk')).toBeNull();
 });
-

@@ -1,7 +1,8 @@
 import StartWalkButton from '@/components/StartWalkButton';
 import TripleFeatureRow from '@/components/TripleFeatureRow';
 import React from 'react';
-import { View, Text, StyleSheet, Image, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, Image,} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   useFonts,
   AnnieUseYourTelescope_400Regular,
