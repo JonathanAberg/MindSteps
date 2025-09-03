@@ -14,8 +14,8 @@ const HomeScreen: React.FC = () => {
 
   return (
      
-    <SafeAreaView style={styles.safe} testID="screen-home">
-      <View style={styles.container}>
+    <SafeAreaView style={styles.safe} >
+      <View style={styles.container} testID="screen-home">
         <View style={styles.header}>
           <Image
             source={require('../../assets/images/mindstepslogo.png')}

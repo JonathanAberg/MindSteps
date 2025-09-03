@@ -58,11 +58,12 @@ const LogWalkScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={styles.safe} testID="screen-logwalk">
+    <SafeAreaView style={styles.safe} >
       <KeyboardAvoidingView
         style={styles.flex1}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 8 : 0}
+        testID="screen-logwalk"
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
           <ScrollView
