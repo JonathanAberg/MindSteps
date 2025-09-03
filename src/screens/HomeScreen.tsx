@@ -13,13 +13,7 @@ const HomeScreen: React.FC = () => {
 
   return (
      
-    <SafeAreaView style={styles.safe}>
-
-
-        <View testID="screen-home"/> {/* är osynlig för appen*/}
-       
-
-
+    <SafeAreaView style={styles.safe} testID="screen-home">
       <View style={styles.container}>
         <View style={styles.header}>
           <Image

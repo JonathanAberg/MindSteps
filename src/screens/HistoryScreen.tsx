@@ -40,10 +40,7 @@ export default function HistoryScreen() {
   }
 
   return (
-    <View style={styles.container}>
-
-      <View testID="screen-history"/> {/* är osynlig för appen*/}
-
+    <View style={styles.container} testID="screen-history">
       <Text style={styles.title}>History</Text>
       <FlatList
         data={sessions}

@@ -58,11 +58,7 @@ const LogWalkScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={styles.safe}>
-
-          <View testID="screen-logwalk"/> {/* är osynlig för appen*/}
-      
-        
+    <SafeAreaView style={styles.safe} testID="screen-logwalk">
       <KeyboardAvoidingView
         style={styles.flex1}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
