@@ -6,14 +6,8 @@ const Line = () => <View style={styles.hr} />;
 
 const InfoScreen: React.FC = () => {
   return (
-    <SafeAreaView style={styles.safe}>
-
-      <View testID="screen-info"> {/* är osynlig för appen*/}
-      <Text>Info</Text>
-    </View>
-
-
-      <ScrollView contentContainerStyle={styles.container}>
+    <SafeAreaView style={styles.safe} >
+      <ScrollView contentContainerStyle={styles.container} testID="screen-info">
         <Text style={styles.title}>Välkommen till MindSteps</Text>
         <Text style={styles.lead}>En app som hjälper dig att tänka klart genom att gå.</Text>
 

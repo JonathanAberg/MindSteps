@@ -1,7 +1,8 @@
 import StartWalkButton from '@/components/StartWalkButton';
 import TripleFeatureRow from '@/components/TripleFeatureRow';
 import React from 'react';
-import { View, Text, StyleSheet, Image, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, Image,} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   useFonts,
   AnnieUseYourTelescope_400Regular,
@@ -13,15 +14,8 @@ const HomeScreen: React.FC = () => {
 
   return (
      
-    <SafeAreaView style={styles.safe}>
-
-
-        <View testID="screen-home"> {/* är osynlig för appen*/}
-          <Text>one step closer to a better mind</Text>
-        </View>
-
-
-      <View style={styles.container}>
+    <SafeAreaView style={styles.safe} >
+      <View style={styles.container} testID="screen-home">
         <View style={styles.header}>
           <Image
             source={require('../../assets/images/mindstepslogo.png')}

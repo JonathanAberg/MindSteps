@@ -74,7 +74,8 @@ if(loading) return <SafeAreaView style={styles.container}><Text>Laddar...</Text>
 if (error) return <SafeAreaView style={styles.container}><Text>Något gick fel.</Text></SafeAreaView>;
 if (!count) return <SafeAreaView style={styles.container}><Text>Inga frågor i {category}</Text></SafeAreaView>
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.safe} >
+      <View style={styles.container} testID="screen-duringwalk" >
 
       <Text style={styles.title}>Under Promenaden</Text>
       
@@ -82,10 +83,6 @@ if (!count) return <SafeAreaView style={styles.container}><Text>Inga frågor i {
       <Text style={styles.subtitle}>
         Kategori: {category} • Intervall: {interval}s
       </Text>
-      
-
-
-      <View testID="screen-logwalk"><Text>Logga promenaden</Text></View>; {/* är osynlig för appen*/}
 
       <Text style={styles.title}>During Walk</Text>
      
@@ -109,6 +106,8 @@ if (!count) return <SafeAreaView style={styles.container}><Text>Inga frågor i {
 
         Här ska det ligga en component <RecordYourAnswer /> för att spela in svar på frågorna. hook useRecordAnswer
       */}
+
+       </View>
     </SafeAreaView>
   );
 };
@@ -116,6 +115,9 @@ if (!count) return <SafeAreaView style={styles.container}><Text>Inga frågor i {
 export default DuringWalkScreen;
 
 const styles = StyleSheet.create({
+  safe: {
+    flex: 1, backgroundColor: '#fff'
+  },
   container: {
     flex: 1,
     justifyContent: "center",

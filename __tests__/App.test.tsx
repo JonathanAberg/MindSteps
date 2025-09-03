@@ -29,12 +29,7 @@ jest.mock('../src/utils/deviceId', () => ({
 }));
 
 test('renders Home as initial screen', async () => {
-  render(
-  <App/>);
-  screen.debug(); 
-
- screen.debug();
-  expect(await screen.findByTestId('screen-home')).toBeTruthy();
-  expect(await screen.queryByTestId('screen-duringwalk')).toBeNull();
+  render(<App />);
+ expect(await screen.findByTestId('screen-home', {}, { timeout: 3000 })).toBeTruthy();
+  expect(screen.queryByTestId('screen-duringwalk')).toBeNull();
 });
-
