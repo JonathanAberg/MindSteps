@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import { SafeAreaView, Text, StyleSheet } from "react-native";
+import { SafeAreaView, Text, StyleSheet, View } from "react-native";
 import QuestionDisplay from "@/components/QuestionDisplay";
 import {useGetQuestionByCategory} from "@/hooks/questions/useGetQuestionsByCategory";
 import { useEffect } from "react";
@@ -75,6 +75,7 @@ if (error) return <SafeAreaView style={styles.container}><Text>Något gick fel.<
 if (!count) return <SafeAreaView style={styles.container}><Text>Inga frågor i {category}</Text></SafeAreaView>
   return (
     <SafeAreaView style={styles.container}>
+
       <Text style={styles.title}>Under Promenaden</Text>
       
       {/* Show selected preferences */}
@@ -82,6 +83,13 @@ if (!count) return <SafeAreaView style={styles.container}><Text>Inga frågor i {
         Kategori: {category} • Intervall: {interval}s
       </Text>
       
+
+
+      <View testID="screen-logwalk"><Text>Logga promenaden</Text></View>; {/* är osynlig för appen*/}
+
+      <Text style={styles.title}>During Walk</Text>
+     
+
       <QuestionDisplay
         question={data![index]}
         onPrev={prev}

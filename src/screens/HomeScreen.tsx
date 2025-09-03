@@ -12,7 +12,15 @@ const HomeScreen: React.FC = () => {
   if (!fontsLoaded) return null;
 
   return (
+     
     <SafeAreaView style={styles.safe}>
+
+
+        <View testID="screen-home"> {/* är osynlig för appen*/}
+          <Text>one step closer to a better mind</Text>
+        </View>
+
+
       <View style={styles.container}>
         <View style={styles.header}>
           <Image
