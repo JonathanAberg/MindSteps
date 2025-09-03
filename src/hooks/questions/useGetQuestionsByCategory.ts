@@ -19,13 +19,7 @@ export function useGetQuestionByCategory(category: string) {
     apiClient
     .get<Question[]>(`/questions/category/${encodeURIComponent(category)}`)
     .then((res) => mounted && setData(res.data))
-  .catch((err) => {
-        console.log(
-          "❌ API-fel:",
-          err?.message,
-          err?.response?.status,
-          err?.response?.data
-        );
+    .catch((err) => {
         if (mounted) setError(err);
       })
     .finally(() => mounted && setLoading(false));

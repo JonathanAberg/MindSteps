@@ -73,7 +73,7 @@ export default function StopWatch({ autoStart = false, onStop, onSecondTick, tes
       if (s !== 'active' && running) pause();
     });
     return () => sub.remove();
-  }, [running]);
+  }, [running, pause]);
 
   useEffect(() => {
     if (autoStart) start();

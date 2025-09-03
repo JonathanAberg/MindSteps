@@ -65,14 +65,14 @@ if (!count) return <SafeAreaView style={styles.container}><Text>Inga frågor i {
     <SafeAreaView style={styles.safe} >
       <View style={styles.container} testID="screen-duringwalk" >
 
-  <View style={{ width: '100%', alignItems: 'center', marginTop: 16 }}>
+  <View style={styles.stopwatchContainer}>
   <StopWatch
     autoStart
-    onSecondTick={(elapsedMs) => {
+    onSecondTick={(_elapsedMs) => {
       // Byt fråga varje 'interval' sekund (om du vill):
       // if (elapsedMs > 0 && Math.floor(elapsedMs/1000) % interval === 0) next();
     }}
-    onStop={(elapsedMs) => {
+    onStop={(_elapsedMs) => {
       // Skicka vidare till LogWalk, spara i backend, etc.
       // navigation.navigate('LogWalk', { elapsedMs })
     }}
@@ -121,6 +121,10 @@ const styles = StyleSheet.create({
     backgroundColor: BG,
     padding: 16,
   },
+  stopwatchContainer: {
+     width: '100%',
+     alignItems: 'center',
+     marginTop: 16 },
   title: {
     fontSize: 24,
     fontWeight: "bold",
