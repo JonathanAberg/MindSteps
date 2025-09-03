@@ -16,7 +16,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 // Definiera stack-parametrarna
 type RootStackParamList = {
   StartScreen: undefined;
-  DuringWalkScreen: {
+  DuringWalk: {
     prefs: { cats: Category[]; interval: QuestionInterval } | null;
   };
 };
@@ -48,7 +48,7 @@ export default function StartWalkButton({ onPress }: Props): ReactElement {
   };
 
   const handleConfirmAll = () => {
-    navigation.navigate('DuringWalkScreen', { prefs });
+    navigation.navigate('DuringWalk', { prefs });
     setStep('none');
   };
 

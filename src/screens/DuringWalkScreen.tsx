@@ -1,9 +1,11 @@
 import React, {useState} from "react";
-import { SafeAreaView, Text, StyleSheet } from "react-native";
+import { SafeAreaView, Text, StyleSheet, View } from "react-native";
 import QuestionDisplay from "@/components/QuestionDisplay";
 import {useGetQuestionByCategory} from "@/hooks/questions/useGetQuestionsByCategory";
 import { useEffect } from "react";
 import apiClient from "@/api/client";
+import { useRoute, RouteProp } from "@react-navigation/native";
+
 /**
  * Efter man tryckt på "Starta promenad" på Home screen och i den overlayn
  * valt att få frågor eller ej så kommer man hit.
@@ -16,15 +18,38 @@ import apiClient from "@/api/client";
  * Eller ska man kunna skriva in svar på frågorna? Svårt när man går men kanske ngt man vill kunna stanna upp och göra?
  */
 
-const DuringWalkScreen: React.FC = () => {
+ // Define the route param types
+ type RootStackParamList = {
+  DuringWalk: {
+    prefs: { 
+      cats: string[]; 
+      interval: number 
+    } | null;
+  };
+};
 
-  const category = "Fokus";
+type DuringWalkScreenRouteProp = RouteProp<RootStackParamList, 'DuringWalk'>;
+
+const DuringWalkScreen: React.FC = () => {
+  // Get route parameters
+  const route = useRoute<DuringWalkScreenRouteProp>();
+  
+  // Access the preferences passed from StartWalkButton
+  const prefs = route.params?.prefs;
+  
+  // Use the first category from preferences or default to "Fokus"
+  const category = prefs?.cats?.[0] || "Fokus";
+  
+  // Get the interval (will be useful for automatic question cycling)
+  const interval = prefs?.interval || 30;
+  
   const {data, loading, error} = useGetQuestionByCategory(category);
 
   useEffect(() => {
   (async () => {
     try {
       const res = await apiClient.get("/questions/category/Fokus");
+      console.log(res.data)
       console.log("✅ API OK, antal frågor:", res.data?.length);
     } catch (e: any) {
       console.log("❌ API fel:", e.message, e.response?.status);
@@ -49,8 +74,19 @@ if(loading) return <SafeAreaView style={styles.container}><Text>Laddar...</Text>
 if (error) return <SafeAreaView style={styles.container}><Text>Något gick fel.</Text></SafeAreaView>;
 if (!count) return <SafeAreaView style={styles.container}><Text>Inga frågor i {category}</Text></SafeAreaView>
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.safe} >
+      <View style={styles.container} testID="screen-duringwalk" >
+
+      <Text style={styles.title}>Under Promenaden</Text>
+      
+      {/* Show selected preferences */}
+      <Text style={styles.subtitle}>
+        Kategori: {category} • Intervall: {interval}s
+      </Text>
+
       <Text style={styles.title}>During Walk</Text>
+     
+
       <QuestionDisplay
         question={data![index]}
         onPrev={prev}
@@ -70,6 +106,8 @@ if (!count) return <SafeAreaView style={styles.container}><Text>Inga frågor i {
 
         Här ska det ligga en component <RecordYourAnswer /> för att spela in svar på frågorna. hook useRecordAnswer
       */}
+
+       </View>
     </SafeAreaView>
   );
 };
@@ -77,6 +115,9 @@ if (!count) return <SafeAreaView style={styles.container}><Text>Inga frågor i {
 export default DuringWalkScreen;
 
 const styles = StyleSheet.create({
+  safe: {
+    flex: 1, backgroundColor: '#fff'
+  },
   container: {
     flex: 1,
     justifyContent: "center",
@@ -87,5 +128,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
+  },
+  subtitle: {
+    fontSize: 16,
+    marginBottom: 20,
+    color: "#666",
   },
 });
