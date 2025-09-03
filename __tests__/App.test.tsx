@@ -1,8 +1,9 @@
 /// <reference types="jest" />
 /* eslint-env jest */
 import React from 'react';
-import { render, waitFor } from '@testing-library/react-native';
+import { render, screen } from '@testing-library/react-native';
 import App from '../src/App';
+
 
 jest.mock('@react-native-async-storage/async-storage', () => ({
   setItem: jest.fn(),
@@ -16,12 +17,24 @@ jest.mock('@expo-google-fonts/annie-use-your-telescope', () => ({
   AnnieUseYourTelescope_400Regular: 'AnnieUseYourTelescope_400Regular',
 }));
 
-test('renders app root', async () => {
-  const { getByText, getAllByText } = render(<App />);
-  await waitFor(() => {
-    expect(getByText('one step closer to a better mind')).toBeTruthy();
-    expect(getAllByText('Hem')).toHaveLength(2); 
-  });
-});
+jest.mock('@expo-google-fonts/montserrat', () => ({
+  useFonts: () => [true],
+  Montserrat_400Regular: 'Montserrat_400Regular',
+  Montserrat_600SemiBold: 'Montserrat_600SemiBold',
+  Montserrat_700Bold: 'Montserrat_700Bold',
+}));
 
+jest.mock('../src/utils/deviceId', () => ({
+  getOrInitDeviceId: jest.fn().mockResolvedValue('mock-device-id'),
+}));
+
+test('renders Home as initial screen', async () => {
+  render(
+  <App/>);
+  screen.debug(); 
+
+ screen.debug();
+  expect(await screen.findByTestId('screen-home')).toBeTruthy();
+  expect(await screen.queryByTestId('screen-duringwalk')).toBeNull();
+});
 

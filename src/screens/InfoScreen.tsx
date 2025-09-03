@@ -7,6 +7,12 @@ const Line = () => <View style={styles.hr} />;
 const InfoScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.safe}>
+
+      <View testID="screen-info"> {/* är osynlig för appen*/}
+      <Text>Info</Text>
+    </View>
+
+
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>Välkommen till MindSteps</Text>
         <Text style={styles.lead}>En app som hjälper dig att tänka klart genom att gå.</Text>
@@ -68,6 +74,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   noteText: { fontSize: 14, color: '#304A76', fontFamily: 'Montserrat_700Bold' },
+
 });
 
 export default InfoScreen;
