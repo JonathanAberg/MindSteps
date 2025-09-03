@@ -55,9 +55,8 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView style={styles.safe}>
 
-      <View testID="screen-settings"> {/* är osynlig för appen*/}
-      <Text>Settings</Text>
-    </View>
+      <View testID="screen-settings"/> {/* är osynlig för appen*/}
+   
 
       <View style={styles.content}>
         {/* Kort: Notiser */}

@@ -8,9 +8,9 @@ const InfoScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.safe}>
 
-      <View testID="screen-info"> {/* är osynlig för appen*/}
-      <Text>Info</Text>
-    </View>
+      <View testID="screen-info"/> {/* är osynlig för appen*/}
+      
+   
 
 
       <ScrollView contentContainerStyle={styles.container}>

@@ -85,7 +85,7 @@ if (!count) return <SafeAreaView style={styles.container}><Text>Inga frågor i {
       
 
 
-      <View testID="screen-logwalk"><Text>Logga promenaden</Text></View>; {/* är osynlig för appen*/}
+      <View testID="screen-logwalk"/>; {/* är osynlig för appen*/}
 
       <Text style={styles.title}>During Walk</Text>
      

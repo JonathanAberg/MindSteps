@@ -16,9 +16,8 @@ const HomeScreen: React.FC = () => {
     <SafeAreaView style={styles.safe}>
 
 
-        <View testID="screen-home"> {/* är osynlig för appen*/}
-          <Text>one step closer to a better mind</Text>
-        </View>
+        <View testID="screen-home"/> {/* är osynlig för appen*/}
+       
 
 
       <View style={styles.container}>
