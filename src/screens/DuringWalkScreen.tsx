@@ -2,9 +2,8 @@ import React, {useState} from "react";
 import { SafeAreaView, Text, StyleSheet, View } from "react-native";
 import QuestionDisplay from "@/components/QuestionDisplay";
 import {useGetQuestionByCategory} from "@/hooks/questions/useGetQuestionsByCategory";
-import { useEffect } from "react";
-import apiClient from "@/api/client";
 import { useRoute, RouteProp } from "@react-navigation/native";
+import StopWatch from "@/components/StopWatch"
 
 /**
  * Efter man tryckt på "Starta promenad" på Home screen och i den overlayn
@@ -38,24 +37,13 @@ const DuringWalkScreen: React.FC = () => {
   const prefs = route.params?.prefs;
   
   // Use the first category from preferences or default to "Fokus"
-  const category = prefs?.cats?.[0] || "Fokus";
+  const category = (prefs?.cats?.[0] || "fokus").toLowerCase();
+    console.log("🔎 Category skickas till hook:", category);
   
   // Get the interval (will be useful for automatic question cycling)
   const interval = prefs?.interval || 30;
   
   const {data, loading, error} = useGetQuestionByCategory(category);
-
-  useEffect(() => {
-  (async () => {
-    try {
-      const res = await apiClient.get("/questions/category/Fokus");
-      console.log(res.data)
-      console.log("✅ API OK, antal frågor:", res.data?.length);
-    } catch (e: any) {
-      console.log("❌ API fel:", e.message, e.response?.status);
-    }
-  })();
-}, []);
 
   const [index, setIndex] = useState(0);
   const count = data?.length ?? 0;
@@ -77,42 +65,50 @@ if (!count) return <SafeAreaView style={styles.container}><Text>Inga frågor i {
     <SafeAreaView style={styles.safe} >
       <View style={styles.container} testID="screen-duringwalk" >
 
-      <Text style={styles.title}>Under Promenaden</Text>
+  <View style={styles.stopwatchContainer}>
+  <StopWatch
+    autoStart
+    onSecondTick={(_elapsedMs) => {
+      // Byt fråga varje 'interval' sekund (om du vill):
+      // if (elapsedMs > 0 && Math.floor(elapsedMs/1000) % interval === 0) next();
+    }}
+    onStop={(_elapsedMs) => {
+      // Skicka vidare till LogWalk, spara i backend, etc.
+      // navigation.navigate('LogWalk', { elapsedMs })
+    }}
+  />
+</View>
+      
       
       {/* Show selected preferences */}
       <Text style={styles.subtitle}>
         Kategori: {category} • Intervall: {interval}s
       </Text>
 
-      <Text style={styles.title}>During Walk</Text>
+      
      
 
-      <QuestionDisplay
-        question={data![index]}
-        onPrev={prev}
-        onNext={next}
-        />
-
-
-      {/*
-        Här ska det ligga en component <StopWatch /> som tickar under pågående promenad
-
-        Här ska det ligga en component <StopWalk /> för att avsluta promenaden, skicka info
-        och navigera till LogWalkScreen. Koppla till backend genom hook useEndWalk
-        (som skickar { JSON.stringify(walkInfo) })
-
-        Här ska det ligga en component <QuestionDisplay /> för att visa frågorna under promenaden.
-        Frågorna hämtas från frågebatteri valt av användaren i inställningarna. hook useQuestions
-
-        Här ska det ligga en component <RecordYourAnswer /> för att spela in svar på frågorna. hook useRecordAnswer
-      */}
-
+    <QuestionDisplay
+  question={data![index]}
+  onPrev={prev}
+  onNext={next}
+  title={`Frågor om ${category}`}
+  index={index}
+  total={count}
+/>
        </View>
     </SafeAreaView>
   );
 };
 
 export default DuringWalkScreen;
+
+const BG = '#EAF1FF';
+//const CARD = '#FFFFFF';
+//const TEXT = '#1F2937';
+//const BLUE_TEXT = '#1D4ED8';
+//const PILL_BG = '#E0EAFF';
+const TITLE_BLUE = '#274C7A';
 
 const styles = StyleSheet.create({
   safe: {
@@ -122,9 +118,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#fff",
+    backgroundColor: BG,
     padding: 16,
   },
+  stopwatchContainer: {
+     width: '100%',
+     alignItems: 'center',
+     marginTop: 16 },
   title: {
     fontSize: 24,
     fontWeight: "bold",
@@ -132,6 +132,6 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     marginBottom: 20,
-    color: "#666",
+    color: TITLE_BLUE,
   },
 });
