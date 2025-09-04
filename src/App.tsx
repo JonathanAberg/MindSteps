@@ -105,26 +105,16 @@ export default function App() {
   };
 
   return (
-<<<<<<< HEAD
-    <>
-=======
     <SessionProvider>
->>>>>>> d30962c (feat(session): lägg till paus/fortsätt/nollställ + förbättrad sessionssparning)
       <NavigationContainer theme={theme} onReady={onLayoutRootView}>
         <AppNavigator />
         <StatusBar style="auto" />
       </NavigationContainer>
-<<<<<<< HEAD
-      
       <OverlayPushPermission
         visible={showPushOverlay}
         onAllow={handleAllowPush}
         onDeny={handleDenyPush}
       />
-    </>
-
-=======
     </SessionProvider>
->>>>>>> d30962c (feat(session): lägg till paus/fortsätt/nollställ + förbättrad sessionssparning)
   );
 }
