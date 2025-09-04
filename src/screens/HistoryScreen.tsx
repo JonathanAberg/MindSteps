@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList } from 'react-native';
 import { fetchSessions } from '../services/api';
 import { HistorySession } from 'types/sessionProps';
-import { getDeviceId } from '@/App';
-
+import { getOrInitDeviceId } from '@/utils/deviceId';
 
 export default function HistoryScreen() {
   const [sessions, setSessions] = useState<HistorySession[]>([]);
@@ -14,15 +13,11 @@ export default function HistoryScreen() {
     const loadSessions = async () => {
       setLoading(true);
       try {
-        const deviceId = getDeviceId(); // Get deviceId from global state
-        if (!deviceId) {
-          setError("Failed to fetch device ID.");
-          return;
-        }
-        const data = await fetchSessions(deviceId); // Pass deviceId to the API
+        const deviceId = await getOrInitDeviceId();
+        const data = await fetchSessions(deviceId);
         setSessions(data);
       } catch (err) {
-        setError("Failed to fetch sessions.");
+        setError('Failed to fetch sessions.');
         console.error(err);
       } finally {
         setLoading(false);

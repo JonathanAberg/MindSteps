@@ -2,21 +2,19 @@ export type SessionProps = {
   steps: number;
   answer: string;
   date: string;
-}
-
-
+};
 
 export type HistorySession = {
   _id: string;
   steps: number;
-  time: string;
-  answer: string;
+  time: number;
+  answer: 'Bra' | 'Okej' | 'Dåligt';
   date: string;
 };
 
 export type CreateSessionProps = {
-  time: string;
+  time: number; // duration i sekunder
   steps: number;
-  answer: string;
+  answer: 'Bra' | 'Okej' | 'Dåligt';
   deviceId: string;
-}
+};

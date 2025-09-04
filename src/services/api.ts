@@ -1,5 +1,5 @@
-import { CreateSessionProps } from "../../types/sessionProps";
-import apiClient from "../api/client"
+import { CreateSessionProps } from '../../types/sessionProps';
+import apiClient from '../api/client';
 
 const api = apiClient;
 
@@ -9,15 +9,11 @@ export const fetchSessions = async (deviceId: string) => {
   return response.data;
 };
 
-
-
 // Create a new session
 export const createSession = async (sessionData: CreateSessionProps) => {
-  const response = await api.post("/sessions", sessionData);
+  const response = await api.post('/sessions/start', sessionData);
   return response.data;
 };
-
-
 
 // Fetch a session by ID
 export const fetchSessionById = async (id: string) => {
@@ -26,7 +22,7 @@ export const fetchSessionById = async (id: string) => {
     return response.data;
   } catch (error) {
     console.error(`Error fetching session with ID ${id}:`, error);
-    throw new Error("Failed to fetch session.");
+    throw new Error('Failed to fetch session.');
   }
 };
 
@@ -36,6 +32,6 @@ export const deleteSession = async (id: string) => {
     return response.data;
   } catch (error) {
     console.error(`Error deleting session with ID ${id}:`, error);
-    throw new Error("Failed to delete session.");
+    throw new Error('Failed to delete session.');
   }
 };

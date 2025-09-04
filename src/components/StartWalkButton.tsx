@@ -11,6 +11,7 @@ import OverlayOne, { type ThumbChoice } from './OverlayOne';
 import OverlayTwo, { type Category, type QuestionInterval } from './OverlayTwo';
 import OverlayThree from './OverlayThree';
 import { useNavigation } from '@react-navigation/native';
+import { useSession } from '@/store/SessionContext';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 // Definiera stack-parametrarna
@@ -31,6 +32,7 @@ export default function StartWalkButton({ onPress }: Props): ReactElement {
   const [prefs, setPrefs] = useState<{ cats: Category[]; interval: QuestionInterval } | null>(null);
 
   const navigation = useNavigation<NavigationProp>();
+  const { start, active } = useSession();
 
   const handlePress = () => {
     setStep('one');
@@ -47,7 +49,16 @@ export default function StartWalkButton({ onPress }: Props): ReactElement {
     setStep('three');
   };
 
-  const handleConfirmAll = () => {
+  const handleConfirmAll = async () => {
+    if (!active) {
+      try {
+        await start();
+      } catch (e) {
+        // Om permissions nekas, avbryt
+        setStep('none');
+        return;
+      }
+    }
     navigation.navigate('DuringWalk', { prefs });
     setStep('none');
   };

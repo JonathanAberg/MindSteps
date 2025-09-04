@@ -6,6 +6,7 @@ import * as Notifications from 'expo-notifications';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer, DefaultTheme, Theme } from '@react-navigation/native';
 import AppNavigator from './navigation/AppNavigator';
+import { SessionProvider } from './store/SessionContext';
 import { getOrInitDeviceId } from './utils/deviceId';
 import { Text as RNText } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
@@ -104,11 +105,16 @@ export default function App() {
   };
 
   return (
+<<<<<<< HEAD
     <>
+=======
+    <SessionProvider>
+>>>>>>> d30962c (feat(session): lägg till paus/fortsätt/nollställ + förbättrad sessionssparning)
       <NavigationContainer theme={theme} onReady={onLayoutRootView}>
         <AppNavigator />
         <StatusBar style="auto" />
       </NavigationContainer>
+<<<<<<< HEAD
       
       <OverlayPushPermission
         visible={showPushOverlay}
@@ -117,5 +123,8 @@ export default function App() {
       />
     </>
 
+=======
+    </SessionProvider>
+>>>>>>> d30962c (feat(session): lägg till paus/fortsätt/nollställ + förbättrad sessionssparning)
   );
 }
