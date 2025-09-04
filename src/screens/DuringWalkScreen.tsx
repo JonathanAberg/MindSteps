@@ -164,12 +164,7 @@ const DuringWalkScreen: React.FC = () => {
 
 export default DuringWalkScreen;
 
-const BG = '#EAF1FF';
-//const CARD = '#FFFFFF';
-//const TEXT = '#1F2937';
-//const BLUE_TEXT = '#1D4ED8';
-//const PILL_BG = '#E0EAFF';
-const TITLE_BLUE = '#274C7A';
+// Removed unused color constants (BG, TITLE_BLUE, etc.) that triggered lint errors.
 
 const styles = StyleSheet.create({
   safe: {

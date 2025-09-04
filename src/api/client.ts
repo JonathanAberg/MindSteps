@@ -5,7 +5,7 @@ type Extra = { API_URL?: string };
 const extra = (Constants.expoConfig?.extra ?? {}) as Extra;
 
 const BASE_URL = extra.API_URL ?? 'http://192.168.0.89:3000';
-console.log('📡 BASE_URL =', BASE_URL);
+// Debug log removed to satisfy eslint no-console rule. If needed, reintroduce via a logger utility.
 
 const apiClient = axios.create({
   baseURL: BASE_URL,
