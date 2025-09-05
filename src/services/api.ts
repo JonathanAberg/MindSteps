@@ -35,3 +35,8 @@ export const deleteSession = async (id: string) => {
     throw new Error('Failed to delete session.');
   }
 };
+
+export const updateSession = async (id: string, data: any) => {
+  const res = await api.put(`/sessions/${id}`, data);
+  return res.data;
+};

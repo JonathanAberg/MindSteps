@@ -1,25 +1,21 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { Pedometer } from 'expo-sensors';
 import { getOrInitDeviceId } from '@/utils/deviceId';
-import { createSession } from '@/services/api';
+import { createSession, updateSession } from '@/services/api'; // CHANGE: ensure updateSession is exported
 
-// Simple dev logger that lints clean (no direct console in code paths)
+// Dev-safe logger
 const devLog = (..._args: any[]) => {
   if (__DEV__) {
-    try {
-      (global as any).console?.log?.(..._args);
-    } catch {
-      /* ignore */
-    }
+    try { (global as any).console?.log?.(..._args); } catch { 
+// ignore
+     } 
   }
 };
 const devError = (..._args: any[]) => {
   if (__DEV__) {
-    try {
-      (global as any).console?.error?.(..._args);
-    } catch {
-      /* ignore */
-    }
+    try { (global as any).console?.error?.(..._args); } catch { 
+// ignore
+     } 
   }
 };
 
@@ -28,6 +24,7 @@ interface ActiveSessionState {
   steps: number;
   startTime: number | null;
   deviceId: string | null;
+  sessionId: string | null; // CHANGE: keep sessionId
   paused?: boolean;
 }
 
@@ -48,14 +45,15 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     steps: 0,
     startTime: null,
     deviceId: null,
+    sessionId: null,
     paused: false,
   });
   const [elapsedSec, setElapsedSec] = useState(0);
   const pedometerSub = useRef<any>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const baseStepsRef = useRef(0); // accumulate steps across pauses
+  const baseStepsRef = useRef(0);
 
-  // init deviceId once
+  // Hämta/initialisera deviceId en gång
   useEffect(() => {
     (async () => {
       const id = await getOrInitDeviceId();
@@ -69,74 +67,114 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       pedometerSub.current = null;
     }
   };
-
   const clearTimer = () => {
     if (timerRef.current) {
       clearInterval(timerRef.current as any);
       timerRef.current = null;
     }
   };
-
   const subscribePedometer = () => {
     pedometerSub.current = Pedometer.watchStepCount((result) => {
-      // result.steps är sedan subscription start. Lägg på basvärde.
       setState((s) => ({ ...s, steps: baseStepsRef.current + result.steps }));
     });
   };
 
   const start = async () => {
     if (state.active) return;
+
     const perm = await Pedometer.requestPermissionsAsync();
-    if (perm.status !== 'granted') {
-      throw new Error('Steg-behörighet nekad');
-    }
+    if (perm.status !== 'granted') throw new Error('Steg-behörighet nekad');
+
     const startTime = Date.now();
     baseStepsRef.current = 0;
-    setState({ active: true, steps: 0, startTime, deviceId: state.deviceId, paused: false });
+
+    setState((s) => ({
+      ...s,
+      active: true,
+      steps: 0,
+      startTime,
+      paused: false,
+      // CHANGE: behåll tidigare deviceId, nollställ sessionId tills backend svarar
+      deviceId: s.deviceId,
+      sessionId: null,
+    }));
+
     setElapsedSec(0);
     subscribePedometer();
-
     timerRef.current = setInterval(() => {
       setElapsedSec(Math.floor((Date.now() - startTime) / 1000));
     }, 1000);
+
+    // CHANGE: skapa tom session direkt (om vi har deviceId)
+    const deviceId = state.deviceId;
+    if (deviceId) {
+      try {
+        const newSession = await createSession({
+          deviceId,
+          steps: 0,
+          time: 0,
+          answer: 'Okej',
+          reflection: '',
+        } as any);
+        devLog('[Session] New session created', newSession);
+        setState((s) => ({ ...s, sessionId: newSession?._id ?? null }));
+      } catch (e) {
+        devError('[Session] Failed to create session at start', e);
+        // Låt promenaden fortsätta lokalt ändå.
+      }
+    }
   };
 
-  // simulation removed
-
-  const stopAndSave = async (answer: 'Bra' | 'Okej' | 'Dåligt' = 'Okej') => {
-    if (!state.active || !state.startTime || !state.deviceId)
+  const stopAndSave = async (
+    answer: 'Bra' | 'Okej' | 'Dåligt' = 'Okej'
+  ): Promise<{ ok: boolean; error?: string }> => {
+    if (!state.active || !state.startTime || !state.deviceId) {
       return { ok: false, error: 'Ingen aktiv session' };
+    }
 
     clearPedometer();
     clearTimer();
-    // simulation removed
 
     const durationSec = Math.max(1, Math.floor((Date.now() - state.startTime) / 1000));
-    const payload = {
-      steps: Number.isFinite(state.steps) ? state.steps : 0,
-      time: Number.isFinite(durationSec) ? durationSec : 1,
-      answer,
-      deviceId: state.deviceId,
-      date: new Date().toISOString(), // in case backend expects date
-    } as const;
-
-    // Debug log (kan tas bort i produktion)
-    devLog('[Session] Creating session payload', payload);
+    const steps = Number.isFinite(state.steps) ? state.steps : 0;
 
     try {
-      const res = await createSession(payload as any);
-      devLog('[Session] Create session response', res);
-      setState({
+      if (state.sessionId) {
+        // CHANGE: uppdatera befintlig session
+        const res = await updateSession(state.sessionId, {
+          steps,
+          time: durationSec,
+          answer,
+          date: new Date().toISOString(),
+        } as any);
+        devLog('[Session] Updated session', res);
+      } else {
+        // CHANGE: fallback – skapa session vid stop om start misslyckades
+        const res = await createSession({
+          deviceId: state.deviceId,
+          steps,
+          time: durationSec,
+          answer,
+          reflection: '',
+          date: new Date().toISOString(),
+        } as any);
+        devLog('[Session] Created session on stop (fallback)', res);
+      }
+
+      // CHANGE: nollställ lokalt (inkl startTime, paused, sessionId)
+      setState((s) => ({
+        ...s,
         active: false,
         steps: 0,
         startTime: null,
-        deviceId: state.deviceId,
         paused: false,
-      });
+        sessionId: null,
+      }));
       setElapsedSec(0);
+
       return { ok: true };
     } catch (e: any) {
-      devError('[Session] Create session error', e?.response?.data || e);
+      devError('[Session] Save error', e?.response?.data || e);
       return { ok: false, error: e?.message || 'Kunde inte spara session' };
     }
   };
@@ -150,9 +188,8 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const resume = () => {
     if (!state.active || !state.paused) return;
-    // Justera startTime baserat på befintlig elapsedSec
     const newStart = Date.now() - elapsedSec * 1000;
-    baseStepsRef.current = state.steps; // spara ackumulerade steg
+    baseStepsRef.current = state.steps;
     subscribePedometer();
     timerRef.current = setInterval(() => {
       setElapsedSec(Math.floor((Date.now() - newStart) / 1000));
@@ -174,14 +211,12 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }, 1000);
   };
 
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    return () => {
       clearPedometer();
       clearTimer();
-      // simulation removed
-    },
-    [],
-  );
+    };
+  }, []);
 
   return (
     <SessionContext.Provider
