@@ -12,12 +12,15 @@ import {
 } from 'react-native';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker'; // npm i @react-native-community/datetimepicker
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getOrInitDeviceId } from '@/utils/deviceId';
+import { deleteAllSessionsForDevice } from '@/services/api';
 
 export default function SettingsScreen() {
   const [pushEnabled, setPushEnabled] = useState<boolean>(true);
   const [reminderEnabled, setReminderEnabled] = useState<boolean>(true);
   const [time, setTime] = useState<Date>(new Date(0, 0, 0, 18, 0));
   const [showPicker, setShowPicker] = useState<boolean>(false);
+  const [wiping, setWiping] = useState(false);
 
   const h = time.getHours().toString().padStart(2, '0');
   const m = time.getMinutes().toString().padStart(2, '0');
@@ -39,12 +42,26 @@ export default function SettingsScreen() {
           style: 'destructive',
           onPress: async () => {
             try {
+              setWiping(true);
+              // Radera lokalt
               await AsyncStorage.clear();
               await AsyncStorage.removeItem('pushPermissionHandled');
               setReminderEnabled(false);
-              Alert.alert('Klart', 'Allt innehåll har raderats.');
+              // Radera sessions på server
+              try {
+                const deviceId = await getOrInitDeviceId();
+                await deleteAllSessionsForDevice(deviceId);
+              } catch {
+                // Om server-radering misslyckas, meddela men fortsätt
+                Alert.alert('Obs', 'Lokalt raderat, men kunde inte radera alla på servern.');
+                setWiping(false);
+                return;
+              }
+              Alert.alert('Klart', 'Allt innehåll (lokalt + promenader) har raderats.');
             } catch {
               Alert.alert('Fel', 'Kunde inte radera innehållet.');
+            } finally {
+              setWiping(false);
             }
           },
         },
@@ -109,8 +126,14 @@ export default function SettingsScreen() {
           </Text>
         </View>
 
-        <TouchableOpacity style={styles.dangerCardButton} onPress={confirmWipe}>
-          <Text style={styles.dangerCardButtonText}>Radera allt innehåll…</Text>
+        <TouchableOpacity
+          style={[styles.dangerCardButton, wiping && styles.dangerCardButtonDisabled]}
+          onPress={wiping ? undefined : confirmWipe}
+          disabled={wiping}
+        >
+          <Text style={styles.dangerCardButtonText}>
+            {wiping ? 'Raderar…' : 'Radera allt innehåll…'}
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -239,6 +262,7 @@ const styles = StyleSheet.create({
     elevation: 4,
     marginBottom: 20,
   },
+  dangerCardButtonDisabled: { opacity: 0.5 },
   dangerCardButtonText: { color: '#E16464', fontFamily: 'Montserrat_700Bold' },
 
   modalBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.35)', justifyContent: 'flex-end' },

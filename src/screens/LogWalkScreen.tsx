@@ -16,7 +16,8 @@ import {
 import MoodSelector, { MoodValue } from '@/components/MoodSelector';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import { getOrInitDeviceId } from '@/utils/deviceId';
-import { createSession } from '@/services/api';
+import { createSession, updateSession } from '@/services/api';
+import { useSession } from '@/store/SessionContext';
 import { Alert, ActivityIndicator } from 'react-native';
 
 type LogRouteParams = {
@@ -26,6 +27,7 @@ type LogRouteParams = {
 
 const LogWalkScreen: React.FC = () => {
   const route = useRoute<RouteProp<Record<string, LogRouteParams>, string>>();
+  const { sessionId } = useSession();
   const [mood, setMood] = useState<MoodValue | null>(null);
   const [note, setNote] = useState('');
   const [deviceId, setDeviceId] = useState<string | null>(null);
@@ -77,16 +79,22 @@ const LogWalkScreen: React.FC = () => {
       same: 'Okej',
       worse: 'Dåligt',
     };
-    const payload = {
-      deviceId,
+    const payloadBase = {
       steps,
       time: Math.max(1, Math.round(durationSec)),
       answer: moodToAnswer[mood],
       reflection: note.trim() || undefined,
+      mood: undefined as number | undefined, // reserverat om ni senare mappar mood till siffra
       date: new Date().toISOString(),
-    } as const;
+    };
     try {
-      await createSession(payload as any);
+      if (sessionId) {
+        // Uppdatera den redan skapade sessionen (skapat vid start)
+        await updateSession(sessionId, payloadBase as any);
+      } else {
+        // Fallback: om start misslyckades skapa nu
+        await createSession({ deviceId, ...payloadBase } as any);
+      }
       Alert.alert('Sparat', 'Promenaden sparades.');
       setMood(null);
       setNote('');

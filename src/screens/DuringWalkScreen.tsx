@@ -1,26 +1,20 @@
-import React, { useState } from 'react';
-import { SafeAreaView, Text, StyleSheet, View, TouchableOpacity, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {
+  SafeAreaView,
+  Text,
+  StyleSheet,
+  View,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
 import QuestionDisplay from '@/components/QuestionDisplay';
 import { useGetQuestionByCategory } from '@/hooks/questions/useGetQuestionsByCategory';
-import { useEffect } from 'react';
 import apiClient from '@/api/client';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import { useSession } from '@/store/SessionContext';
 import { useNavigation } from '@react-navigation/native';
 
-/**
- * Efter man tryckt på "Starta promenad" på Home screen och i den overlayn
- * valt att få frågor eller ej så kommer man hit.
- *
- * Här ser man under promenaden hur klockan tickar och en stoppknapp för när man
- * vill avsluta promenaden.
- *
- * Kanske vill vi att frågorna kommer upp här i text samtidigt som de läses upp av appen?
- * Kanske vill vi ha en inspelningsknapp för att spela in svar på frågorna?
- * Eller ska man kunna skriva in svar på frågorna? Svårt när man går men kanske ngt man vill kunna stanna upp och göra?
- */
-
-// Define the route param types
 type RootStackParamList = {
   DuringWalk: {
     prefs: {
@@ -33,17 +27,24 @@ type RootStackParamList = {
 type DuringWalkScreenRouteProp = RouteProp<RootStackParamList, 'DuringWalk'>;
 
 const DuringWalkScreen: React.FC = () => {
-  // Get route parameters
   const route = useRoute<DuringWalkScreenRouteProp>();
-
   const prefs = route.params?.prefs;
-
   const category = prefs?.cats?.[0] || 'Fokus';
-
   const interval = prefs?.interval || 30;
 
   const { data, loading, error } = useGetQuestionByCategory(category);
-  const { steps, elapsedSec, finish, active, pause, resume, reset, paused } = useSession() as any;
+  const {
+    steps,
+    elapsedSec,
+    finish,
+    active,
+    pause,
+    resume,
+    reset,
+    paused,
+    sessionId,
+    creatingSession,
+  } = useSession() as any;
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -71,63 +72,92 @@ const DuringWalkScreen: React.FC = () => {
 
   if (loading)
     return (
-      <SafeAreaView style={styles.container}>
-        <Text>Laddar...</Text>
+      <SafeAreaView style={styles.safe}>
+        <View style={styles.center}>
+          <Text style={styles.muted}>Laddar...</Text>
+        </View>
       </SafeAreaView>
     );
   if (error)
     return (
-      <SafeAreaView style={styles.container}>
-        <Text>Något gick fel.</Text>
+      <SafeAreaView style={styles.safe}>
+        <View style={styles.center}>
+          <Text style={styles.muted}>Något gick fel.</Text>
+        </View>
       </SafeAreaView>
     );
   if (!count)
     return (
-      <SafeAreaView style={styles.container}>
-        <Text>Inga frågor i {category}</Text>
+      <SafeAreaView style={styles.safe}>
+        <View style={styles.center}>
+          <Text style={styles.muted}>Inga frågor i {category}</Text>
+        </View>
       </SafeAreaView>
     );
+
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.container} testID="screen-duringwalk">
-        <Text style={styles.title}>Under Promenaden</Text>
+        {/* Vit “kort”-panel som i mockupen — endast layout/styling */}
+        <View style={styles.card}>
+          <Text style={styles.timerText}>
+            {`${String(Math.floor(elapsedSec / 3600)).padStart(2, '0')}:${String(
+              Math.floor((elapsedSec % 3600) / 60),
+            ).padStart(2, '0')}:${String(elapsedSec % 60).padStart(2, '0')}`}
+          </Text>
 
-        {/* Show selected preferences */}
-        <Text style={styles.subtitle}>
-          Kategori: {category} • Intervall: {interval}s
-        </Text>
-
-        <Text style={styles.title}>Steg: {steps}</Text>
-        <Text style={styles.subtitle}>
-          Tid: {Math.floor(elapsedSec / 60)}m {elapsedSec % 60}s
-        </Text>
+          <View style={styles.metricsRow}>
+            <View style={styles.metricsColLeft}>
+              <Text style={styles.metricLabel}>Sträcka</Text>
+              <Text style={styles.metricLabel}>Steg</Text>
+            </View>
+            <View style={styles.metricsColRight}>
+              {/* Oförändrat värdeinnehåll (vi visar bara ”Steg” som tidigare) */}
+              <Text style={styles.metricValue}>—</Text>
+              <Text style={styles.metricValue}>{steps}</Text>
+            </View>
+          </View>
+        </View>
 
         {active && (
           <View style={styles.actionsRow}>
             <TouchableOpacity
-              style={[styles.actionBtn, paused && styles.actionBtnInactive]}
+              style={[styles.pillBtn, paused ? styles.pillAlt : styles.pillPrimary]}
               onPress={() => (paused ? resume() : pause())}
             >
-              <Text style={styles.actionText}>{paused ? 'Fortsätt' : 'Pausa'}</Text>
+              <Text style={styles.pillText}>{paused ? 'Fortsätt' : 'Pausa'}</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.actionBtn, styles.resetBtn]}
+              style={[styles.pillBtn, styles.pillAlt]}
               onPress={reset}
               disabled={paused && steps === 0 && elapsedSec === 0}
             >
-              <Text style={styles.actionText}>Nollställ</Text>
+              <Text style={styles.pillZero}>Nollställ</Text>
             </TouchableOpacity>
           </View>
         )}
 
-        {!active && <Text style={styles.subtitle}>Ingen aktiv session</Text>}
+        {!active && <Text style={styles.muted}>Ingen aktiv session</Text>}
 
-        <QuestionDisplay question={data![index]} onPrev={prev} onNext={next} />
+        <View style={styles.qWrapper}>
+          <Text style={styles.footerNote}>
+            Kategori: {category} • Intervall: {interval}s
+          </Text>
+          <QuestionDisplay question={data![index]} onPrev={prev} onNext={next} />
+        </View>
 
         {active && (
           <TouchableOpacity
-            style={styles.stopButton}
+            style={[
+              styles.stopButton,
+              (!sessionId || creatingSession) && styles.stopButtonDisabled,
+            ]}
+            disabled={!sessionId || creatingSession}
             onPress={() => {
+              if (!sessionId) {
+                Alert.alert('Vänta', 'Initierar session...');
+                return;
+              }
               const summary = finish();
               if (!summary) {
                 Alert.alert('Fel', 'Ingen aktiv session');
@@ -136,22 +166,13 @@ const DuringWalkScreen: React.FC = () => {
               (navigation as any).navigate('LogWalk', summary);
             }}
           >
-            <Text style={styles.stopButtonText}>Avsluta</Text>
+            {creatingSession ? (
+              <ActivityIndicator color={COLORS.red} />
+            ) : (
+              <Text style={styles.stopButtonText}>Avsluta</Text>
+            )}
           </TouchableOpacity>
         )}
-
-        {/*
-        Här ska det ligga en component <StopWatch /> som tickar under pågående promenad
-
-        Här ska det ligga en component <StopWalk /> för att avsluta promenaden, skicka info
-        och navigera till LogWalkScreen. Koppla till backend genom hook useEndWalk
-        (som skickar { JSON.stringify(walkInfo) })
-
-        Här ska det ligga en component <QuestionDisplay /> för att visa frågorna under promenaden.
-        Frågorna hämtas från frågebatteri valt av användaren i inställningarna. hook useQuestions
-
-        Här ska det ligga en component <RecordYourAnswer /> för att spela in svar på frågorna. hook useRecordAnswer
-      */}
       </View>
     </SafeAreaView>
   );
@@ -159,54 +180,109 @@ const DuringWalkScreen: React.FC = () => {
 
 export default DuringWalkScreen;
 
-// Removed unused color constants (BG, TITLE_BLUE, etc.) that triggered lint errors.
+const COLORS = {
+  bg: '#DEE8FC', // ljus blå bakgrund
+  card: '#FFFFFF', // vit panel
+  darkBlue: '#304A76', // primär text (timer)
+  midBlue: '#7E9CD2 ', // etiketter
+  chipBlue: '#E1E9FF', // piller-knappar
+  chipAlt: '#EDF4FF',
+  red: '#E06868',
+  muted: '#71819A',
+};
 
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.bg,
   },
   container: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
     padding: 16,
   },
-  stopwatchContainer: {
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+
+  // Kortet
+  card: {
     width: '100%',
+    backgroundColor: COLORS.card,
+    borderRadius: 18,
+    paddingVertical: 18,
+    paddingHorizontal: 16,
     alignItems: 'center',
-    marginTop: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 3,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
+  timerText: {
+    fontSize: 30,
+    fontFamily: 'Montserrat_700Bold',
+    color: COLORS.darkBlue,
+    marginBottom: 12,
+    letterSpacing: 0.5,
   },
-  subtitle: {
+  metricsRow: {
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'space-between',
+    paddingHorizontal: 6,
+  },
+  metricsColLeft: { gap: 8 },
+  metricsColRight: { alignItems: 'flex-end', gap: 8 },
+  metricLabel: {
     fontSize: 16,
-    marginBottom: 20,
-    color: '#666',
+    fontFamily: 'Montserrat_700Bold',
+    color: '#7E9CD2',
   },
-  stopButton: {
-    marginTop: 32,
-    backgroundColor: '#d9534f',
-    paddingVertical: 14,
-    paddingHorizontal: 28,
-    borderRadius: 30,
+  metricValue: {
+    fontSize: 16,
+    fontFamily: 'Montserrat_700Bold',
+    color: COLORS.darkBlue,
   },
-  stopButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  // Sekundära kontroller
   actionsRow: {
     flexDirection: 'row',
-    gap: 16,
+    gap: 12,
     marginTop: 8,
+    marginBottom: 4,
   },
-  actionBtn: {
-    backgroundColor: '#DEE8FC',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 28,
+  pillBtn: {
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: 999,
   },
-  actionBtnInactive: { backgroundColor: '#E9F1FF' },
-  actionText: { color: '#304A76', fontWeight: '600' },
-  resetBtn: { backgroundColor: '#E1F5FF' },
+  pillPrimary: { backgroundColor: '#FFFFFF' },
+  pillAlt: { backgroundColor: COLORS.chipAlt },
+  pillText: { color: COLORS.darkBlue, fontFamily: 'Montserrat_700Bold' },
+  pillZero: { color: COLORS.red, fontFamily: 'Montserrat_700Bold' },
+  // Frågor
+  qWrapper: { width: '100%', marginTop: 8 },
+  // Stopp-knapp (vit med röd text)
+  stopButton: {
+    marginTop: 50,
+    backgroundColor: COLORS.card,
+    paddingVertical: 14,
+    paddingHorizontal: 28,
+    borderRadius: 999,
+    alignSelf: 'stretch',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 2,
+  },
+  stopButtonText: {
+    color: COLORS.red,
+    fontSize: 18,
+    fontFamily: 'Montserrat_700Bold',
+    letterSpacing: 0.5,
+  },
+  stopButtonDisabled: { opacity: 0.5 },
+  muted: { color: COLORS.muted, fontSize: 16 },
+  footerNote: { display: 'none', marginTop: 8, color: COLORS.muted, fontSize: 13 },
 });

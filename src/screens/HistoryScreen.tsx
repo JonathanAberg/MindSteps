@@ -28,7 +28,13 @@ export default function HistoryScreen() {
       try {
         const deviceId = await getOrInitDeviceId();
         const data = await fetchSessions(deviceId);
-        setSessions(data);
+        const filtered = (data || []).filter(
+          (s: any) => !(s?.steps === 0 && (s?.time === 0 || s?.time === undefined))
+        );
+        setSessions(filtered);
+        if (__DEV__ && data.length !== filtered.length) {
+          console.warn('[History] Placeholder/dubblett filtrerad bort');
+        }
       } catch (err) {
         setError('Failed to fetch sessions.');
         console.error(err);
@@ -44,7 +50,10 @@ export default function HistoryScreen() {
     try {
       const deviceId = await getOrInitDeviceId();
       const data = await fetchSessions(deviceId);
-      setSessions(data);
+      const filtered = (data || []).filter(
+        (s: any) => !(s?.steps === 0 && (s?.time === 0 || s?.time === undefined))
+      );
+      setSessions(filtered);
     } catch (e) {
       // ignore silently in refresh
     } finally {

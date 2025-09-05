@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, View, Text, Pressable, TouchableOpacity, StyleSheet } from 'react-native';
 import Feather from '@expo/vector-icons/Feather';
+import { useSession } from '@/store/SessionContext';
 
 export type ThumbChoice = 'up' | 'down';
 
@@ -13,6 +14,7 @@ type Props = {
 
 export default function OverlayThree({ visible, onConfirmAll, onBack, onBackdropPress }: Props) {
   const [choice, setChoice] = useState<ThumbChoice | null>(null);
+  const { start } = useSession();
 
   useEffect(() => {
     if (visible) setChoice(null); // reset när modal öppnas
@@ -66,13 +68,24 @@ export default function OverlayThree({ visible, onConfirmAll, onBack, onBackdrop
               <Text style={styles.cancel}>Tillbaka</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={() => choice && onConfirmAll(choice)}
-              disabled={!canConfirm}
-              style={[styles.cta, !canConfirm && styles.ctaDisabled]}
-            >
-              <Text style={styles.ctaText}>Bekräfta</Text>
-            </TouchableOpacity>
+         <TouchableOpacity
+  onPress={async () => {
+    if (choice) {
+      if (choice === 'up') {
+        try {
+          await start(); // 🚀 Skapar session i backend och startar timer + steg
+        } catch (e) {
+          console.error("Kunde inte starta session:", e);
+        }
+      }
+      onConfirmAll(choice); // kör vidare din logik (t.ex. navigation)
+    }
+  }}
+  disabled={!canConfirm}
+  style={[styles.cta, !canConfirm && styles.ctaDisabled]}
+>
+  <Text style={styles.ctaText}>Bekräfta</Text>
+</TouchableOpacity>
           </View>
         </View>
       </View>
