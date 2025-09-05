@@ -53,6 +53,7 @@ report.*.json
 
 # OS
 .DS_Store
+.vscode/
 
 # Optional caches
 .eslintcache
