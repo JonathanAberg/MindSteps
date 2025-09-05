@@ -1,9 +1,7 @@
 import React, { useEffect, useState, type ReactElement } from 'react';
 import { Modal, View, Text, Pressable, TouchableOpacity, StyleSheet } from 'react-native';
 
-// Exportera typer så andra filer kan använda dem
 export type Category = 'oro' | 'fokus' | 'slapp' | 'planering' | 'reflekterande' | 'filosofiska';
-
 export type QuestionInterval = 15 | 30 | 'once';
 
 type Props = {
@@ -24,6 +22,7 @@ const ALL_CATEGORIES: Array<{ key: Category; label: string; emoji: string }> = [
   { key: 'filosofiska', label: 'Filosofiska', emoji: '🤔' },
 ];
 
+// Intervall finns kvar för kompatibilitet, men döljs i UI och defaultas
 const INTERVALS: Array<{ key: QuestionInterval; label: string }> = [
   { key: 15, label: 'Var 15:e minut' },
   { key: 30, label: 'Var 30:e minut' },
@@ -39,12 +38,13 @@ export default function OverlayTwo({
   onBackdropPress,
 }: Props): ReactElement {
   const [selectedCats, setSelectedCats] = useState<Set<Category>>(new Set());
-  const [selectedInterval, setSelectedInterval] = useState<QuestionInterval | null>(null);
+  // Viktigt: ha alltid ett värde (fallback 'once')
+  const [selectedInterval, setSelectedInterval] = useState<QuestionInterval>('once');
 
   useEffect(() => {
     if (visible) {
       setSelectedCats(new Set(initialCategories ?? []));
-      setSelectedInterval(initialInterval ?? null);
+      setSelectedInterval(initialInterval ?? 'once');
     }
   }, [visible, initialCategories, initialInterval]);
 
@@ -55,11 +55,13 @@ export default function OverlayTwo({
   };
 
   const confirm = () => {
-    if (!selectedInterval || selectedCats.size === 0) return;
-    onConfirm(Array.from(selectedCats), selectedInterval);
+    if (selectedCats.size === 0) return;
+    // Använd alltid ett intervallvärde (default 'once')
+    onConfirm(Array.from(selectedCats), selectedInterval ?? 'once');
   };
 
-  const canConfirm = selectedCats.size > 0 && !!selectedInterval;
+  // Nu räcker det med minst en kategori
+  const canConfirm = selectedCats.size > 0;
 
   return (
     <Modal visible={visible} transparent animationType="fade" statusBarTranslucent>
@@ -98,7 +100,10 @@ export default function OverlayTwo({
             })}
           </View>
 
-          <Text style={[styles.heading]}>Vilket intervall vill du att{'\n'}frågorna ställs?</Text>
+          {/* Intervallrubrik och UI dolda – vi behåller dem för ev. framtida behov */}
+          <Text style={[styles.headingcategory]}>
+            Vilket intervall vill du att{'\n'}frågorna ställs?
+          </Text>
 
           <View style={styles.intervalRow}>
             {INTERVALS.map(({ key, label }) => {
@@ -178,6 +183,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     marginTop: 12,
   },
+  // Dold
+  headingcategory: { display: 'none' },
+
   grid: {
     marginTop: 6,
     flexDirection: 'row',
@@ -211,7 +219,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   categoryLabelSelected: { fontWeight: '600' },
+  // Dolda intervallchips
   intervalRow: {
+    display: 'none',
     marginTop: 6,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -231,12 +241,14 @@ const styles = StyleSheet.create({
     borderColor: TEXT_PRIMARY,
   },
   intervalText: { fontSize: 13, color: TEXT_PRIMARY, textAlign: 'center' },
-  intervalTextSelected: { fontWeight: '600' },
   footer: {
     marginTop: 14,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  intervalTextSelected: {
+    color: TEXT_PRIMARY,
   },
   cancel: {
     color: TEXT_PRIMARY,
@@ -251,6 +263,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   ctaDisabled: { opacity: 0.5 },
-  ctaText: { color: 'white', fontWeight: '600', fontSize: 15 },
+  ctaText: { color: 'white', fontSize: 15 },
   pressed: { opacity: 0.7 },
 });
