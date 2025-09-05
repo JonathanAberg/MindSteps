@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef, useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -14,18 +14,32 @@ import {
   findNodeHandle,
 } from 'react-native';
 import MoodSelector, { MoodValue } from '@/components/MoodSelector';
+import { useRoute, RouteProp } from '@react-navigation/native';
+import { getOrInitDeviceId } from '@/utils/deviceId';
+import { createSession, updateSession } from '@/services/api';
+import { useSession } from '@/store/SessionContext';
+import { Alert, ActivityIndicator } from 'react-native';
 
-// Syfte: Visa resultatet av en avslutad promenad (tid + sträcka), låta användaren ange mood och skriva en notis, samt spara sessionen.
+type LogRouteParams = {
+  steps?: number;
+  durationSec?: number;
+};
 
 const LogWalkScreen: React.FC = () => {
-  const [mood, setMood] = useState<MoodValue | null>(null); // Mood värdet kommer från MoodSelector (krävs för att aktivera "Spara").
-  const [note, setNote] = useState(''); // Användarens fria text/reflektion; startar tomt och växer allteftersom man skriver.
+  const route = useRoute<RouteProp<Record<string, LogRouteParams>, string>>();
+  const { sessionId } = useSession();
+  const [mood, setMood] = useState<MoodValue | null>(null);
+  const [note, setNote] = useState('');
+  const [deviceId, setDeviceId] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
   const inputRef = useRef<TextInput>(null);
 
-  // MOCK – byt till hooks när "Stoppa promenaden-button" är klar
-  const distanceKm = 12.1;
-  const durationMin = 80;
+  const steps = route.params?.steps ?? 0;
+  const durationSec = route.params?.durationSec ?? 0;
+
+  const distanceKm = steps > 0 ? steps * 0.0007 : 0;
+  const durationMin = Math.max(1, Math.round(durationSec / 60));
   const endedAt = useMemo(() => new Date(), []);
 
   const dateLabel = useMemo(
@@ -38,27 +52,61 @@ const LogWalkScreen: React.FC = () => {
     return h > 0 ? `${h} tim ${m} min` : `${m} min`;
   }, [durationMin]);
 
-  const canSave = mood !== null;
+  const canSave = mood !== null && !submitting && steps >= 0 && durationSec > 0 && deviceId;
+
+  useEffect(() => {
+    (async () => {
+      const id = await getOrInitDeviceId();
+      setDeviceId(id);
+    })();
+  }, []);
 
   const scrollToInput = () => {
     const node = findNodeHandle(inputRef.current);
     if (!node || !scrollRef.current) return;
 
-    // Mäter absolut position för input och scrollar dit
     inputRef.current!.measureInWindow((x, y) => {
-      // Justera lite ovanför så kanten inte hamnar under navbar/tangentbord
       const targetY = Math.max(y - 120, 0);
       scrollRef.current?.scrollTo({ y: targetY, animated: true });
     });
   };
 
-  const handleSave = () => {
-    if (!canSave) return;
-    // Hantera sparad gångdata (t.ex. skicka till backend eller uppdatera status)
+  const handleSave = async () => {
+    if (!canSave || !deviceId || !mood) return;
+    setSubmitting(true);
+    const moodToAnswer: Record<MoodValue, 'Bra' | 'Okej' | 'Dåligt'> = {
+      better: 'Bra',
+      same: 'Okej',
+      worse: 'Dåligt',
+    };
+    const payloadBase = {
+      steps,
+      time: Math.max(1, Math.round(durationSec)),
+      answer: moodToAnswer[mood],
+      reflection: note.trim() || undefined,
+      mood: undefined as number | undefined, // reserverat om ni senare mappar mood till siffra
+      date: new Date().toISOString(),
+    };
+    try {
+      if (sessionId) {
+        // Uppdatera den redan skapade sessionen (skapat vid start)
+        await updateSession(sessionId, payloadBase as any);
+      } else {
+        // Fallback: om start misslyckades skapa nu
+        await createSession({ deviceId, ...payloadBase } as any);
+      }
+      Alert.alert('Sparat', 'Promenaden sparades.');
+      setMood(null);
+      setNote('');
+    } catch (e: any) {
+      Alert.alert('Fel', e?.response?.data?.error || 'Kunde inte spara. Försök igen.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
-    <SafeAreaView style={styles.safe} >
+    <SafeAreaView style={styles.safe}>
       <KeyboardAvoidingView
         style={styles.flex1}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -105,11 +153,15 @@ const LogWalkScreen: React.FC = () => {
             <TouchableOpacity
               onPress={handleSave}
               disabled={!canSave}
-              style={[styles.saveBtn, !canSave && styles.saveBtnDisabled]}
+              style={[styles.saveBtn, (!canSave || submitting) && styles.saveBtnDisabled]}
               accessibilityRole="button"
               accessibilityState={{ disabled: !canSave }}
             >
-              <Text style={[styles.saveText, !canSave && styles.saveTextDisabled]}>Spara</Text>
+              {submitting ? (
+                <ActivityIndicator color="#689FE0" />
+              ) : (
+                <Text style={[styles.saveText, !canSave && styles.saveTextDisabled]}>Spara</Text>
+              )}
             </TouchableOpacity>
           </ScrollView>
         </TouchableWithoutFeedback>

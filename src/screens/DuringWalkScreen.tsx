@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, Text, StyleSheet, View, TouchableOpacity, Alert } from 'react-native';
+import {
+  SafeAreaView,
+  Text,
+  StyleSheet,
+  View,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
 import QuestionDisplay from '@/components/QuestionDisplay';
 import { useGetQuestionByCategory } from '@/hooks/questions/useGetQuestionsByCategory';
 import apiClient from '@/api/client';
@@ -25,8 +33,18 @@ const DuringWalkScreen: React.FC = () => {
   const interval = prefs?.interval || 30;
 
   const { data, loading, error } = useGetQuestionByCategory(category);
-  const { steps, elapsedSec, stopAndSave, active, pause, resume, reset, paused } =
-    useSession() as any;
+  const {
+    steps,
+    elapsedSec,
+    finish,
+    active,
+    pause,
+    resume,
+    reset,
+    paused,
+    sessionId,
+    creatingSession,
+  } = useSession() as any;
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -130,18 +148,29 @@ const DuringWalkScreen: React.FC = () => {
 
         {active && (
           <TouchableOpacity
-            style={styles.stopButton}
-            onPress={async () => {
-              const res = await stopAndSave('Okej');
-              if (!res.ok) {
-                Alert.alert('Fel', res.error || 'Kunde inte spara');
+            style={[
+              styles.stopButton,
+              (!sessionId || creatingSession) && styles.stopButtonDisabled,
+            ]}
+            disabled={!sessionId || creatingSession}
+            onPress={() => {
+              if (!sessionId) {
+                Alert.alert('Vänta', 'Initierar session...');
                 return;
               }
-              Alert.alert('Sparat', 'Promenaden sparades');
-              navigation.navigate('LogWalk' as never);
+              const summary = finish();
+              if (!summary) {
+                Alert.alert('Fel', 'Ingen aktiv session');
+                return;
+              }
+              (navigation as any).navigate('LogWalk', summary);
             }}
           >
-            <Text style={styles.stopButtonText}>Stopp</Text>
+            {creatingSession ? (
+              <ActivityIndicator color={COLORS.red} />
+            ) : (
+              <Text style={styles.stopButtonText}>Avsluta</Text>
+            )}
           </TouchableOpacity>
         )}
       </View>
@@ -253,6 +282,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Montserrat_700Bold',
     letterSpacing: 0.5,
   },
+  stopButtonDisabled: { opacity: 0.5 },
   muted: { color: COLORS.muted, fontSize: 16 },
   footerNote: { display: 'none', marginTop: 8, color: COLORS.muted, fontSize: 13 },
 });

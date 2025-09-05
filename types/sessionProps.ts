@@ -10,11 +10,16 @@ export type HistorySession = {
   time: number;
   answer: 'Bra' | 'Okej' | 'Dåligt';
   date: string;
+  mood?: number;
+  reflection?: string;
 };
 
 export type CreateSessionProps = {
-  time: number; // duration i sekunder
+  time: number;
   steps: number;
   answer: 'Bra' | 'Okej' | 'Dåligt';
   deviceId: string;
+  date?: string;
+  mood?: number;
+  reflection?: string;
 };

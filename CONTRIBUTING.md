@@ -84,7 +84,7 @@ src/
 ## Vanliga kommandon
 
 - Installera: `npm ci`
-- Starta: `npm run start`
+- Starta: `npm start`
 - iOS: `npm run ios`
 - Android: `npm run android`
 - Rensa cache: `npx expo start -c`

@@ -3,19 +3,16 @@ import apiClient from '../api/client';
 
 const api = apiClient;
 
-// Fetch all sessions
 export const fetchSessions = async (deviceId: string) => {
   const response = await api.get(`/sessions?deviceId=${deviceId}`);
   return response.data;
 };
 
-// Create a new session
 export const createSession = async (sessionData: CreateSessionProps) => {
   const response = await api.post('/sessions/start', sessionData);
   return response.data;
 };
 
-// Fetch a session by ID
 export const fetchSessionById = async (id: string) => {
   try {
     const response = await api.get(`/sessions/${id}`);
@@ -39,4 +36,26 @@ export const deleteSession = async (id: string) => {
 export const updateSession = async (id: string, data: any) => {
   const res = await api.put(`/sessions/${id}`, data);
   return res.data;
+};
+
+// Bulk delete helper (iterativ om backend saknar särskilt endpoint)
+export const deleteAllSessionsForDevice = async (deviceId: string) => {
+  try {
+    // Försök med direkt endpoint om backend stödjer det
+    // (om inte existerar kommer den kasta och vi faller tillbaka)
+    const direct = await api.delete(`/sessions?deviceId=${deviceId}`).catch(() => null);
+    if (direct) return direct.data;
+  } catch {
+    // ignore – fallback nedan tar över
+  }
+  // Fallback: hämta och radera en-i-taget
+  const list = await fetchSessions(deviceId);
+  for (const s of list) {
+    try {
+      await deleteSession(s._id);
+    } catch {
+      /* fortsätt med nästa */
+    }
+  }
+  return { deleted: list.length };
 };
