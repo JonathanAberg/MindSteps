@@ -1,4 +1,3 @@
-// src/screens/InfoScreen.tsx
 import React from 'react';
 import { SafeAreaView, ScrollView, View, Text, StyleSheet } from 'react-native';
 
@@ -6,35 +5,35 @@ const Line = () => <View style={styles.hr} />;
 
 const InfoScreen: React.FC = () => {
   return (
-    <SafeAreaView style={styles.safe} >
+    <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.container} testID="screen-info">
         <Text style={styles.title}>Välkommen till MindSteps</Text>
         <Text style={styles.lead}>En app som hjälper dig att tänka klart genom att gå.</Text>
 
         <Line />
 
-        <View >
+        <View>
           <Text style={styles.sectionTitle}>Kom igång automatiskt</Text>
           <Text style={styles.sectionText}>
             Appen startar när du börjar promenera – du behöver inte göra något själv.
           </Text>
         </View>
 
-        <View >
+        <View>
           <Text style={styles.sectionTitle}>Reflektera under promenaden</Text>
           <Text style={styles.sectionText}>
             Få en fråga att tänka på eller välj en själv. Du kan även prata in dina tankar.
           </Text>
         </View>
 
-        <View >
+        <View>
           <Text style={styles.sectionTitle}>Se tillbaka</Text>
           <Text style={styles.sectionText}>
             Efter promenaden loggas sträcka, tid och hur du mådde. Följ din utveckling över tid.
           </Text>
         </View>
 
-        <View >
+        <View>
           <Text style={styles.sectionTitle}>Påminnelser</Text>
           <Text style={styles.sectionText}>
             Har du suttit still länge? Appen påminner dig om att ta en tanke-promenad.
@@ -99,7 +98,6 @@ const styles = StyleSheet.create({
   },
 
   noteText: { fontSize: 14, color: '#304A76', fontFamily: 'Montserrat_700Bold' },
-
 });
 
 export default InfoScreen;

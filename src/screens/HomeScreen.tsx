@@ -1,20 +1,19 @@
 import StartWalkButton from '@/components/StartWalkButton';
 import TripleFeatureRow from '@/components/TripleFeatureRow';
 import React from 'react';
-import { View, Text, StyleSheet, Image,} from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   useFonts,
   AnnieUseYourTelescope_400Regular,
-} from '@expo-google-fonts/annie-use-your-telescope'; // Installera med: expo install @expo-google-fonts/annie-use-your-telescope expo-font
+} from '@expo-google-fonts/annie-use-your-telescope';
 
 const HomeScreen: React.FC = () => {
   const [fontsLoaded] = useFonts({ AnnieUseYourTelescope_400Regular });
   if (!fontsLoaded) return null;
 
   return (
-     
-    <SafeAreaView style={styles.safe} >
+    <SafeAreaView style={styles.safe}>
       <View style={styles.container} testID="screen-home">
         <View style={styles.header}>
           <Image

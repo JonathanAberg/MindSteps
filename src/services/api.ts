@@ -3,19 +3,16 @@ import apiClient from '../api/client';
 
 const api = apiClient;
 
-// Fetch all sessions
 export const fetchSessions = async (deviceId: string) => {
   const response = await api.get(`/sessions?deviceId=${deviceId}`);
   return response.data;
 };
 
-// Create a new session
 export const createSession = async (sessionData: CreateSessionProps) => {
   const response = await api.post('/sessions/start', sessionData);
   return response.data;
 };
 
-// Fetch a session by ID
 export const fetchSessionById = async (id: string) => {
   try {
     const response = await api.get(`/sessions/${id}`);

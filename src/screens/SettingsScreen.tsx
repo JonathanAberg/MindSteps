@@ -16,10 +16,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function SettingsScreen() {
   const [pushEnabled, setPushEnabled] = useState<boolean>(true);
   const [reminderEnabled, setReminderEnabled] = useState<boolean>(true);
-  const [time, setTime] = useState<Date>(new Date(0, 0, 0, 18, 0)); // 18:00
+  const [time, setTime] = useState<Date>(new Date(0, 0, 0, 18, 0));
   const [showPicker, setShowPicker] = useState<boolean>(false);
 
-  // Enkel, tydlig tidslabel
   const h = time.getHours().toString().padStart(2, '0');
   const m = time.getMinutes().toString().padStart(2, '0');
   const timeLabel = `${h}:${m}`;

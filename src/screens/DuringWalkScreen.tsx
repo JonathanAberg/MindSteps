@@ -36,18 +36,14 @@ const DuringWalkScreen: React.FC = () => {
   // Get route parameters
   const route = useRoute<DuringWalkScreenRouteProp>();
 
-  // Access the preferences passed from StartWalkButton
   const prefs = route.params?.prefs;
 
-  // Use the first category from preferences or default to "Fokus"
   const category = prefs?.cats?.[0] || 'Fokus';
 
-  // Get the interval (will be useful for automatic question cycling)
   const interval = prefs?.interval || 30;
 
   const { data, loading, error } = useGetQuestionByCategory(category);
-  const { steps, elapsedSec, stopAndSave, active, pause, resume, reset, paused } =
-    useSession() as any;
+  const { steps, elapsedSec, finish, active, pause, resume, reset, paused } = useSession() as any;
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -131,17 +127,16 @@ const DuringWalkScreen: React.FC = () => {
         {active && (
           <TouchableOpacity
             style={styles.stopButton}
-            onPress={async () => {
-              const res = await stopAndSave('Okej');
-              if (!res.ok) {
-                Alert.alert('Fel', res.error || 'Kunde inte spara');
+            onPress={() => {
+              const summary = finish();
+              if (!summary) {
+                Alert.alert('Fel', 'Ingen aktiv session');
                 return;
               }
-              Alert.alert('Sparat', 'Promenaden sparades');
-              navigation.navigate('LogWalk' as never);
+              (navigation as any).navigate('LogWalk', summary);
             }}
           >
-            <Text style={styles.stopButtonText}>Avsluta & Spara</Text>
+            <Text style={styles.stopButtonText}>Avsluta</Text>
           </TouchableOpacity>
         )}
 

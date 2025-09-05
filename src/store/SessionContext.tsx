@@ -3,23 +3,21 @@ import { Pedometer } from 'expo-sensors';
 import { getOrInitDeviceId } from '@/utils/deviceId';
 import { createSession } from '@/services/api';
 
-// Simple dev logger that lints clean (no direct console in code paths)
+// Dev-loggar (tyst i produktion)
 const devLog = (..._args: any[]) => {
-  if (__DEV__) {
-    try {
-      (global as any).console?.log?.(..._args);
-    } catch {
-      /* ignore */
-    }
+  if (!__DEV__) return;
+  try {
+    (global as any).console?.log?.(..._args);
+  } catch {
+    /* ignore */
   }
 };
 const devError = (..._args: any[]) => {
-  if (__DEV__) {
-    try {
-      (global as any).console?.error?.(..._args);
-    } catch {
-      /* ignore */
-    }
+  if (!__DEV__) return;
+  try {
+    (global as any).console?.error?.(..._args);
+  } catch {
+    /* ignore */
   }
 };
 
@@ -38,6 +36,7 @@ interface SessionContextValue extends ActiveSessionState {
   pause: () => void;
   resume: () => void;
   reset: () => void;
+  finish: () => { steps: number; durationSec: number } | null;
 }
 
 const SessionContext = createContext<SessionContextValue | undefined>(undefined);
@@ -53,9 +52,8 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [elapsedSec, setElapsedSec] = useState(0);
   const pedometerSub = useRef<any>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const baseStepsRef = useRef(0); // accumulate steps across pauses
-
-  // init deviceId once
+  const baseStepsRef = useRef(0); // ackumulerat över pauser
+  // Hämta/initialisera deviceId en gång
   useEffect(() => {
     (async () => {
       const id = await getOrInitDeviceId();
@@ -101,11 +99,12 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }, 1000);
   };
 
-  // simulation removed
-
-  const stopAndSave = async (answer: 'Bra' | 'Okej' | 'Dåligt' = 'Okej') => {
-    if (!state.active || !state.startTime || !state.deviceId)
+  const stopAndSave = async (
+    answer: 'Bra' | 'Okej' | 'Dåligt' = 'Okej',
+  ): Promise<{ ok: boolean; error?: string }> => {
+    if (!state.active || !state.startTime || !state.deviceId) {
       return { ok: false, error: 'Ingen aktiv session' };
+    }
 
     clearPedometer();
     clearTimer();
@@ -150,8 +149,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const resume = () => {
     if (!state.active || !state.paused) return;
-    // Justera startTime baserat på befintlig elapsedSec
-    const newStart = Date.now() - elapsedSec * 1000;
+    const newStart = Date.now() - elapsedSec * 1000; // justera startTime
     baseStepsRef.current = state.steps; // spara ackumulerade steg
     subscribePedometer();
     timerRef.current = setInterval(() => {
@@ -183,9 +181,31 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     [],
   );
 
+  // Avsluta utan att spara – returnerar en sammanfattning för LogWalk-skärmen
+  const finish = (): { steps: number; durationSec: number } | null => {
+    if (!state.active || !state.startTime) return null;
+
+    // Stoppa sensorer/timer
+    clearPedometer();
+    clearTimer();
+
+    const durationSec = Math.max(1, Math.floor((Date.now() - state.startTime) / 1000));
+    const steps = Number.isFinite(state.steps) ? state.steps : 0;
+
+    // Markera sessionen som inaktiv men behåll steps & sessionId (behövs ev. för PUT)
+    setState((s) => ({
+      ...s,
+      active: false,
+      paused: false,
+      startTime: null,
+    }));
+
+    return { steps, durationSec };
+  };
+
   return (
     <SessionContext.Provider
-      value={{ ...state, start, stopAndSave, elapsedSec, pause, resume, reset }}
+      value={{ ...state, start, stopAndSave, elapsedSec, pause, resume, reset, finish }}
     >
       {children}
     </SessionContext.Provider>
